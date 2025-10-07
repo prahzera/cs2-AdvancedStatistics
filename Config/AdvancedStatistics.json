@@ -1,9 +1,0 @@
-{
-  "DatabaseHost": "localhost",
-  "DatabasePort": 3306,
-  "DatabaseName": "cs2_stats",
-  "DatabaseUser": "root",
-  "DatabasePassword": "",
-  "TrackBotEvents": false,
-  "UpdateInterval": 30
-}

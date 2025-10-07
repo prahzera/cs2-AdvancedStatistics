@@ -8,9 +8,9 @@ namespace AdvancedStatistics
 {
     public class AdvancedStatisticsPlugin : BasePlugin
     {
-        public override string ModuleName => "Advanced Statistics";
+        public override string ModuleName => "AdvancedStatistics";
         public override string ModuleVersion => "1.0.0";
-        public override string ModuleAuthor => "AdvancedStats Team";
+        public override string ModuleAuthor => "Prahzera";
 
         private PluginConfig _config = new PluginConfig();
         private DatabaseManager _databaseManager = null!;
