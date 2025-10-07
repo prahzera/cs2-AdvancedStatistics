@@ -1,76 +1,61 @@
-# Advanced Statistics Plugin for CS2
+# Advanced Statistics Plugin
 
-[![English](https://img.shields.io/badge/README-English-blue)](README.md)
-[![Español](https://img.shields.io/badge/README-Español-red)](README_es.md)
+Un plugin de Counter-Strike 2 que registra estadísticas detalladas de los jugadores.
 
-Advanced statistics plugin for Counter-Strike 2 that tracks and stores detailed game data in a MySQL database.
+## Características
 
-## Features
+- Seguimiento de kills, muertes y asistencias
+- Estadísticas por arma (AK-47, M4A4, M4A1-S, AWP, etc.)
+- Seguimiento de daño hecho y recibido
+- Estadísticas de headshots por arma
+- Seguimiento detallado por partes del cuerpo (pecho, estómago, piernas)
+- Soporte para eventos durante el calentamiento (configurable)
+- Soporte para estadísticas de bots (configurable)
 
-- Detailed tracking of kills, deaths, and assists by specific weapon
-- MySQL database storage
-- Customizable configuration
-- Option to include or exclude bot events
-- Real-time statistics
+## Configuración
 
-## Requirements
-
-- Counter-Strike Sharp
-- MySQL Server
-- .NET 7.0
-
-## Installation
-
-1. Compile the plugin
-2. Copy files to the Counter-Strike Sharp plugins folder
-3. Configure the database in the configuration file
-4. Restart the server
-
-## Configuration
-
-The configuration file is located at `configs/plugins/AdvancedStatistics/AdvancedStatistics.json`:
+El plugin se puede configurar mediante el archivo `configs/plugins/AdvancedStatistics/AdvancedStatistics.json`:
 
 ```json
 {
   "DatabaseHost": "localhost",
   "DatabasePort": 3306,
   "DatabaseName": "cs2_stats",
-  "DatabaseUser": "root",
-  "DatabasePassword": "",
-  "TrackBotEvents": false,
-  "UpdateInterval": 30
+  "DatabaseUser": "user",
+  "DatabasePassword": "password",
+  "TrackWarmupEvents": false,
+  "TrackBotEvents": false
 }
 ```
 
-## Database Structure
+## Comandos
 
-The plugin automatically creates the `player_stats` table with columns for:
+- `css_stats` - Muestra las estadísticas del jugador
 
-- General statistics (kills, deaths, assists, headshots, etc.)
-- Kills by specific weapon (ak47_kills, m4a4_kills, etc.)
-- Deaths by specific weapon (ak47_deaths, m4a4_deaths, etc.)
-- Assists by specific weapon (ak47_assists, m4a4_assists, etc.)
+## Base de Datos
 
-## Usage
+El plugin crea automáticamente la tabla `player_stats` con las siguientes columnas:
 
-Once installed and configured, the plugin will automatically track game events and store them in the database.
+- Estadísticas generales (kills, deaths, assists, headshots, daño, etc.)
+- Estadísticas específicas por arma (kills, deaths, assists, headshots)
+- Estadísticas por tipo de impacto (headshots, chestshots, stomachshots, legshots)
 
-## Development
+## Instalación
 
-To compile the plugin:
+1. Compilar el plugin
+2. Copiar los archivos a la carpeta de plugins de CS2
+3. Configurar la base de datos en el archivo de configuración
+4. Cargar el plugin en el servidor
 
-```bash
-dotnet build
-```
+## Requisitos
 
-## Contributing
+- Servidor CS2 con CSSharp
+- Base de datos MySQL/MariaDB
 
-1. Fork the repository
-2. Create a branch for your feature (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
+## Contribuir
 
-## License
+Si deseas contribuir al proyecto, por favor crea un fork y envía un pull request.
 
-This project is licensed under the MIT License.
+## Licencia
+
+MIT

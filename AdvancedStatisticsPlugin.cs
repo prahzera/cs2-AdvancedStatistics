@@ -59,6 +59,10 @@ namespace AdvancedStatistics
             RegisterEventHandler<EventPlayerConnectFull>(_weaponTrackingEvents.OnPlayerConnectFull);
             RegisterEventHandler<EventPlayerDisconnect>(_weaponTrackingEvents.OnPlayerDisconnect);
             
+            // Registrar eventos de calentamiento
+            RegisterEventHandler<EventRoundStart>(OnRoundStart);
+            RegisterEventHandler<EventRoundAnnounceWarmup>(OnWarmupStart);
+            
             // Registrar tick listener para procesar la cola de acciones en el hilo principal
             RegisterListener<CounterStrikeSharp.API.Core.Listeners.OnTick>(MainThreadDispatcher.ProcessQueue);
             
@@ -81,6 +85,18 @@ namespace AdvancedStatistics
             {
                 Logger.LogError($"[Advanced Statistics] Failed to initialize database: {ex.Message}");
             }
+        }
+
+        public HookResult OnRoundStart(EventRoundStart @event, GameEventInfo info)
+        {
+            _weaponTrackingEvents.IsWarmup = false; // Comienza la partida real
+            return HookResult.Continue;
+        }
+
+        public HookResult OnWarmupStart(EventRoundAnnounceWarmup @event, GameEventInfo info)
+        {
+            _weaponTrackingEvents.IsWarmup = true;
+            return HookResult.Continue;
         }
 
         public override void Unload(bool hotReload)

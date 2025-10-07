@@ -2,7 +2,7 @@ namespace AdvancedStatistics.Utils
 {
     public enum HitGroup
     {
-        Invalid = 0,
+        Generic = 0,
         Head = 1,
         Chest = 2,
         Stomach = 3,
@@ -10,6 +10,6 @@ namespace AdvancedStatistics.Utils
         RightArm = 5,
         LeftLeg = 6,
         RightLeg = 7,
-        Gear = 8
+        Gear = 10
     }
 }

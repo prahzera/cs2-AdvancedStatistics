@@ -13,7 +13,7 @@ namespace AdvancedStatistics.Services
         private readonly DatabaseManager _databaseManager;
         private readonly Logger _logger;
         private ILogger? _internalLogger;
-        private Dictionary<string, PlayerStats> _cachedStats = new();
+        public Dictionary<string, PlayerStats> _cachedStats = new();
 
         public StatsService(DatabaseManager databaseManager, Logger logger)
         {
@@ -314,6 +314,54 @@ namespace AdvancedStatistics.Services
                             stats.RevolverKills++;
                             _logger.LogStatsUpdate(attackerName, "Revolver Kills", stats.RevolverKills);
                             if (headshot) stats.RevolverHeadshots++;
+                            break;
+                        case "nova":
+                            stats.NovaKills++;
+                            _logger.LogStatsUpdate(attackerName, "Nova Kills", stats.NovaKills);
+                            break;
+                        case "xm1014":
+                            stats.XM1014Kills++;
+                            _logger.LogStatsUpdate(attackerName, "XM1014 Kills", stats.XM1014Kills);
+                            break;
+                        case "sawedoff":
+                            stats.SawedOffKills++;
+                            _logger.LogStatsUpdate(attackerName, "SawedOff Kills", stats.SawedOffKills);
+                            break;
+                        case "mag7":
+                            stats.MAG7Kills++;
+                            _logger.LogStatsUpdate(attackerName, "MAG7 Kills", stats.MAG7Kills);
+                            break;
+                        case "mac10":
+                            stats.Mac10Kills++;
+                            _logger.LogStatsUpdate(attackerName, "Mac10 Kills", stats.Mac10Kills);
+                            break;
+                        case "mp9":
+                            stats.MP9Kills++;
+                            _logger.LogStatsUpdate(attackerName, "MP9 Kills", stats.MP9Kills);
+                            break;
+                        case "mp7":
+                            stats.MP7Kills++;
+                            _logger.LogStatsUpdate(attackerName, "MP7 Kills", stats.MP7Kills);
+                            break;
+                        case "ump45":
+                            stats.UMP45Kills++;
+                            _logger.LogStatsUpdate(attackerName, "UMP45 Kills", stats.UMP45Kills);
+                            break;
+                        case "p90":
+                            stats.P90Kills++;
+                            _logger.LogStatsUpdate(attackerName, "P90 Kills", stats.P90Kills);
+                            break;
+                        case "bizon":
+                            stats.BizonKills++;
+                            _logger.LogStatsUpdate(attackerName, "Bizon Kills", stats.BizonKills);
+                            break;
+                        case "negev":
+                            stats.NegevKills++;
+                            _logger.LogStatsUpdate(attackerName, "Negev Kills", stats.NegevKills);
+                            break;
+                        case "m249":
+                            stats.M249Kills++;
+                            _logger.LogStatsUpdate(attackerName, "M249 Kills", stats.M249Kills);
                             break;
                         // ... más armas según sea necesario
                     }
@@ -632,6 +680,150 @@ namespace AdvancedStatistics.Services
                                 case HitGroup.RightLeg: stats.RevolverRightLegshots++; _logger.LogStatsUpdate(attackerName, "Revolver Right Legshots", stats.RevolverRightLegshots); break;
                             }
                             break;
+                        case "nova":
+                            stats.NovaKills++;
+                            _logger.LogStatsUpdate(attackerName, "Nova Kills", stats.NovaKills);
+                            switch (hitGroupEnum)
+                            {
+                                case HitGroup.Head: stats.NovaHeadshots++; _logger.LogStatsUpdate(attackerName, "Nova Headshots", stats.NovaHeadshots); break;
+                                case HitGroup.Chest: stats.NovaChestshots++; _logger.LogStatsUpdate(attackerName, "Nova Chestshots", stats.NovaChestshots); break;
+                                case HitGroup.Stomach: stats.NovaStomachshots++; _logger.LogStatsUpdate(attackerName, "Nova Stomachshots", stats.NovaStomachshots); break;
+                                case HitGroup.LeftLeg: stats.NovaLeftLegshots++; _logger.LogStatsUpdate(attackerName, "Nova Left Legshots", stats.NovaLeftLegshots); break;
+                                case HitGroup.RightLeg: stats.NovaRightLegshots++; _logger.LogStatsUpdate(attackerName, "Nova Right Legshots", stats.NovaRightLegshots); break;
+                            }
+                            break;
+                        case "xm1014":
+                            stats.XM1014Kills++;
+                            _logger.LogStatsUpdate(attackerName, "XM1014 Kills", stats.XM1014Kills);
+                            switch (hitGroupEnum)
+                            {
+                                case HitGroup.Head: stats.XM1014Headshots++; _logger.LogStatsUpdate(attackerName, "XM1014 Headshots", stats.XM1014Headshots); break;
+                                case HitGroup.Chest: stats.XM1014Chestshots++; _logger.LogStatsUpdate(attackerName, "XM1014 Chestshots", stats.XM1014Chestshots); break;
+                                case HitGroup.Stomach: stats.XM1014Stomachshots++; _logger.LogStatsUpdate(attackerName, "XM1014 Stomachshots", stats.XM1014Stomachshots); break;
+                                case HitGroup.LeftLeg: stats.XM1014LeftLegshots++; _logger.LogStatsUpdate(attackerName, "XM1014 Left Legshots", stats.XM1014LeftLegshots); break;
+                                case HitGroup.RightLeg: stats.XM1014RightLegshots++; _logger.LogStatsUpdate(attackerName, "XM1014 Right Legshots", stats.XM1014RightLegshots); break;
+                            }
+                            break;
+                        case "sawedoff":
+                            stats.SawedOffKills++;
+                            _logger.LogStatsUpdate(attackerName, "SawedOff Kills", stats.SawedOffKills);
+                            switch (hitGroupEnum)
+                            {
+                                case HitGroup.Head: stats.SawedOffHeadshots++; _logger.LogStatsUpdate(attackerName, "SawedOff Headshots", stats.SawedOffHeadshots); break;
+                                case HitGroup.Chest: stats.SawedOffChestshots++; _logger.LogStatsUpdate(attackerName, "SawedOff Chestshots", stats.SawedOffChestshots); break;
+                                case HitGroup.Stomach: stats.SawedOffStomachshots++; _logger.LogStatsUpdate(attackerName, "SawedOff Stomachshots", stats.SawedOffStomachshots); break;
+                                case HitGroup.LeftLeg: stats.SawedOffLeftLegshots++; _logger.LogStatsUpdate(attackerName, "SawedOff Left Legshots", stats.SawedOffLeftLegshots); break;
+                                case HitGroup.RightLeg: stats.SawedOffRightLegshots++; _logger.LogStatsUpdate(attackerName, "SawedOff Right Legshots", stats.SawedOffRightLegshots); break;
+                            }
+                            break;
+                        case "mag7":
+                            stats.MAG7Kills++;
+                            _logger.LogStatsUpdate(attackerName, "MAG7 Kills", stats.MAG7Kills);
+                            switch (hitGroupEnum)
+                            {
+                                case HitGroup.Head: stats.MAG7Headshots++; _logger.LogStatsUpdate(attackerName, "MAG7 Headshots", stats.MAG7Headshots); break;
+                                case HitGroup.Chest: stats.MAG7Chestshots++; _logger.LogStatsUpdate(attackerName, "MAG7 Chestshots", stats.MAG7Chestshots); break;
+                                case HitGroup.Stomach: stats.MAG7Stomachshots++; _logger.LogStatsUpdate(attackerName, "MAG7 Stomachshots", stats.MAG7Stomachshots); break;
+                                case HitGroup.LeftLeg: stats.MAG7LeftLegshots++; _logger.LogStatsUpdate(attackerName, "MAG7 Left Legshots", stats.MAG7LeftLegshots); break;
+                                case HitGroup.RightLeg: stats.MAG7RightLegshots++; _logger.LogStatsUpdate(attackerName, "MAG7 Right Legshots", stats.MAG7RightLegshots); break;
+                            }
+                            break;
+                        case "mac10":
+                            stats.Mac10Kills++;
+                            _logger.LogStatsUpdate(attackerName, "Mac10 Kills", stats.Mac10Kills);
+                            switch (hitGroupEnum)
+                            {
+                                case HitGroup.Head: stats.Mac10Headshots++; _logger.LogStatsUpdate(attackerName, "Mac10 Headshots", stats.Mac10Headshots); break;
+                                case HitGroup.Chest: stats.Mac10Chestshots++; _logger.LogStatsUpdate(attackerName, "Mac10 Chestshots", stats.Mac10Chestshots); break;
+                                case HitGroup.Stomach: stats.Mac10Stomachshots++; _logger.LogStatsUpdate(attackerName, "Mac10 Stomachshots", stats.Mac10Stomachshots); break;
+                                case HitGroup.LeftLeg: stats.Mac10LeftLegshots++; _logger.LogStatsUpdate(attackerName, "Mac10 Left Legshots", stats.Mac10LeftLegshots); break;
+                                case HitGroup.RightLeg: stats.Mac10RightLegshots++; _logger.LogStatsUpdate(attackerName, "Mac10 Right Legshots", stats.Mac10RightLegshots); break;
+                            }
+                            break;
+                        case "mp9":
+                            stats.MP9Kills++;
+                            _logger.LogStatsUpdate(attackerName, "MP9 Kills", stats.MP9Kills);
+                            switch (hitGroupEnum)
+                            {
+                                case HitGroup.Head: stats.MP9Headshots++; _logger.LogStatsUpdate(attackerName, "MP9 Headshots", stats.MP9Headshots); break;
+                                case HitGroup.Chest: stats.MP9Chestshots++; _logger.LogStatsUpdate(attackerName, "MP9 Chestshots", stats.MP9Chestshots); break;
+                                case HitGroup.Stomach: stats.MP9Stomachshots++; _logger.LogStatsUpdate(attackerName, "MP9 Stomachshots", stats.MP9Stomachshots); break;
+                                case HitGroup.LeftLeg: stats.MP9LeftLegshots++; _logger.LogStatsUpdate(attackerName, "MP9 Left Legshots", stats.MP9LeftLegshots); break;
+                                case HitGroup.RightLeg: stats.MP9RightLegshots++; _logger.LogStatsUpdate(attackerName, "MP9 Right Legshots", stats.MP9RightLegshots); break;
+                            }
+                            break;
+                        case "mp7":
+                            stats.MP7Kills++;
+                            _logger.LogStatsUpdate(attackerName, "MP7 Kills", stats.MP7Kills);
+                            switch (hitGroupEnum)
+                            {
+                                case HitGroup.Head: stats.MP7Headshots++; _logger.LogStatsUpdate(attackerName, "MP7 Headshots", stats.MP7Headshots); break;
+                                case HitGroup.Chest: stats.MP7Chestshots++; _logger.LogStatsUpdate(attackerName, "MP7 Chestshots", stats.MP7Chestshots); break;
+                                case HitGroup.Stomach: stats.MP7Stomachshots++; _logger.LogStatsUpdate(attackerName, "MP7 Stomachshots", stats.MP7Stomachshots); break;
+                                case HitGroup.LeftLeg: stats.MP7LeftLegshots++; _logger.LogStatsUpdate(attackerName, "MP7 Left Legshots", stats.MP7LeftLegshots); break;
+                                case HitGroup.RightLeg: stats.MP7RightLegshots++; _logger.LogStatsUpdate(attackerName, "MP7 Right Legshots", stats.MP7RightLegshots); break;
+                            }
+                            break;
+                        case "ump45":
+                            stats.UMP45Kills++;
+                            _logger.LogStatsUpdate(attackerName, "UMP45 Kills", stats.UMP45Kills);
+                            switch (hitGroupEnum)
+                            {
+                                case HitGroup.Head: stats.UMP45Headshots++; _logger.LogStatsUpdate(attackerName, "UMP45 Headshots", stats.UMP45Headshots); break;
+                                case HitGroup.Chest: stats.UMP45Chestshots++; _logger.LogStatsUpdate(attackerName, "UMP45 Chestshots", stats.UMP45Chestshots); break;
+                                case HitGroup.Stomach: stats.UMP45Stomachshots++; _logger.LogStatsUpdate(attackerName, "UMP45 Stomachshots", stats.UMP45Stomachshots); break;
+                                case HitGroup.LeftLeg: stats.UMP45LeftLegshots++; _logger.LogStatsUpdate(attackerName, "UMP45 Left Legshots", stats.UMP45LeftLegshots); break;
+                                case HitGroup.RightLeg: stats.UMP45RightLegshots++; _logger.LogStatsUpdate(attackerName, "UMP45 Right Legshots", stats.UMP45RightLegshots); break;
+                            }
+                            break;
+                        case "p90":
+                            stats.P90Kills++;
+                            _logger.LogStatsUpdate(attackerName, "P90 Kills", stats.P90Kills);
+                            switch (hitGroupEnum)
+                            {
+                                case HitGroup.Head: stats.P90Headshots++; _logger.LogStatsUpdate(attackerName, "P90 Headshots", stats.P90Headshots); break;
+                                case HitGroup.Chest: stats.P90Chestshots++; _logger.LogStatsUpdate(attackerName, "P90 Chestshots", stats.P90Chestshots); break;
+                                case HitGroup.Stomach: stats.P90Stomachshots++; _logger.LogStatsUpdate(attackerName, "P90 Stomachshots", stats.P90Stomachshots); break;
+                                case HitGroup.LeftLeg: stats.P90LeftLegshots++; _logger.LogStatsUpdate(attackerName, "P90 Left Legshots", stats.P90LeftLegshots); break;
+                                case HitGroup.RightLeg: stats.P90RightLegshots++; _logger.LogStatsUpdate(attackerName, "P90 Right Legshots", stats.P90RightLegshots); break;
+                            }
+                            break;
+                        case "bizon":
+                            stats.BizonKills++;
+                            _logger.LogStatsUpdate(attackerName, "Bizon Kills", stats.BizonKills);
+                            switch (hitGroupEnum)
+                            {
+                                case HitGroup.Head: stats.BizonHeadshots++; _logger.LogStatsUpdate(attackerName, "Bizon Headshots", stats.BizonHeadshots); break;
+                                case HitGroup.Chest: stats.BizonChestshots++; _logger.LogStatsUpdate(attackerName, "Bizon Chestshots", stats.BizonChestshots); break;
+                                case HitGroup.Stomach: stats.BizonStomachshots++; _logger.LogStatsUpdate(attackerName, "Bizon Stomachshots", stats.BizonStomachshots); break;
+                                case HitGroup.LeftLeg: stats.BizonLeftLegshots++; _logger.LogStatsUpdate(attackerName, "Bizon Left Legshots", stats.BizonLeftLegshots); break;
+                                case HitGroup.RightLeg: stats.BizonRightLegshots++; _logger.LogStatsUpdate(attackerName, "Bizon Right Legshots", stats.BizonRightLegshots); break;
+                            }
+                            break;
+                        case "negev":
+                            stats.NegevKills++;
+                            _logger.LogStatsUpdate(attackerName, "Negev Kills", stats.NegevKills);
+                            switch (hitGroupEnum)
+                            {
+                                case HitGroup.Head: stats.NegevHeadshots++; _logger.LogStatsUpdate(attackerName, "Negev Headshots", stats.NegevHeadshots); break;
+                                case HitGroup.Chest: stats.NegevChestshots++; _logger.LogStatsUpdate(attackerName, "Negev Chestshots", stats.NegevChestshots); break;
+                                case HitGroup.Stomach: stats.NegevStomachshots++; _logger.LogStatsUpdate(attackerName, "Negev Stomachshots", stats.NegevStomachshots); break;
+                                case HitGroup.LeftLeg: stats.NegevLeftLegshots++; _logger.LogStatsUpdate(attackerName, "Negev Left Legshots", stats.NegevLeftLegshots); break;
+                                case HitGroup.RightLeg: stats.NegevRightLegshots++; _logger.LogStatsUpdate(attackerName, "Negev Right Legshots", stats.NegevRightLegshots); break;
+                            }
+                            break;
+                        case "m249":
+                            stats.M249Kills++;
+                            _logger.LogStatsUpdate(attackerName, "M249 Kills", stats.M249Kills);
+                            switch (hitGroupEnum)
+                            {
+                                case HitGroup.Head: stats.M249Headshots++; _logger.LogStatsUpdate(attackerName, "M249 Headshots", stats.M249Headshots); break;
+                                case HitGroup.Chest: stats.M249Chestshots++; _logger.LogStatsUpdate(attackerName, "M249 Chestshots", stats.M249Chestshots); break;
+                                case HitGroup.Stomach: stats.M249Stomachshots++; _logger.LogStatsUpdate(attackerName, "M249 Stomachshots", stats.M249Stomachshots); break;
+                                case HitGroup.LeftLeg: stats.M249LeftLegshots++; _logger.LogStatsUpdate(attackerName, "M249 Left Legshots", stats.M249LeftLegshots); break;
+                                case HitGroup.RightLeg: stats.M249RightLegshots++; _logger.LogStatsUpdate(attackerName, "M249 Right Legshots", stats.M249RightLegshots); break;
+                            }
+                            break;
                         // ... más armas según sea necesario
                     }
                 }
@@ -768,6 +960,54 @@ namespace AdvancedStatistics.Services
                         case "revolver":
                             stats.RevolverDeaths++;
                             _logger.LogStatsUpdate(victimName, "Revolver Deaths", stats.RevolverDeaths);
+                            break;
+                        case "nova":
+                            stats.NovaDeaths++;
+                            _logger.LogStatsUpdate(victimName, "Nova Deaths", stats.NovaDeaths);
+                            break;
+                        case "xm1014":
+                            stats.XM1014Deaths++;
+                            _logger.LogStatsUpdate(victimName, "XM1014 Deaths", stats.XM1014Deaths);
+                            break;
+                        case "sawedoff":
+                            stats.SawedOffDeaths++;
+                            _logger.LogStatsUpdate(victimName, "SawedOff Deaths", stats.SawedOffDeaths);
+                            break;
+                        case "mag7":
+                            stats.MAG7Deaths++;
+                            _logger.LogStatsUpdate(victimName, "MAG7 Deaths", stats.MAG7Deaths);
+                            break;
+                        case "mac10":
+                            stats.Mac10Deaths++;
+                            _logger.LogStatsUpdate(victimName, "Mac10 Deaths", stats.Mac10Deaths);
+                            break;
+                        case "mp9":
+                            stats.MP9Deaths++;
+                            _logger.LogStatsUpdate(victimName, "MP9 Deaths", stats.MP9Deaths);
+                            break;
+                        case "mp7":
+                            stats.MP7Deaths++;
+                            _logger.LogStatsUpdate(victimName, "MP7 Deaths", stats.MP7Deaths);
+                            break;
+                        case "ump45":
+                            stats.UMP45Deaths++;
+                            _logger.LogStatsUpdate(victimName, "UMP45 Deaths", stats.UMP45Deaths);
+                            break;
+                        case "p90":
+                            stats.P90Deaths++;
+                            _logger.LogStatsUpdate(victimName, "P90 Deaths", stats.P90Deaths);
+                            break;
+                        case "bizon":
+                            stats.BizonDeaths++;
+                            _logger.LogStatsUpdate(victimName, "Bizon Deaths", stats.BizonDeaths);
+                            break;
+                        case "negev":
+                            stats.NegevDeaths++;
+                            _logger.LogStatsUpdate(victimName, "Negev Deaths", stats.NegevDeaths);
+                            break;
+                        case "m249":
+                            stats.M249Deaths++;
+                            _logger.LogStatsUpdate(victimName, "M249 Deaths", stats.M249Deaths);
                             break;
                         // ... más armas según sea necesario
                     }
@@ -909,6 +1149,54 @@ namespace AdvancedStatistics.Services
                             stats.RevolverAssists++;
                             _logger.LogStatsUpdate(assisterName, "Revolver Assists", stats.RevolverAssists);
                             break;
+                        case "nova":
+                            stats.NovaAssists++;
+                            _logger.LogStatsUpdate(assisterName, "Nova Assists", stats.NovaAssists);
+                            break;
+                        case "xm1014":
+                            stats.XM1014Assists++;
+                            _logger.LogStatsUpdate(assisterName, "XM1014 Assists", stats.XM1014Assists);
+                            break;
+                        case "sawedoff":
+                            stats.SawedOffAssists++;
+                            _logger.LogStatsUpdate(assisterName, "SawedOff Assists", stats.SawedOffAssists);
+                            break;
+                        case "mag7":
+                            stats.MAG7Assists++;
+                            _logger.LogStatsUpdate(assisterName, "MAG7 Assists", stats.MAG7Assists);
+                            break;
+                        case "mac10":
+                            stats.Mac10Assists++;
+                            _logger.LogStatsUpdate(assisterName, "Mac10 Assists", stats.Mac10Assists);
+                            break;
+                        case "mp9":
+                            stats.MP9Assists++;
+                            _logger.LogStatsUpdate(assisterName, "MP9 Assists", stats.MP9Assists);
+                            break;
+                        case "mp7":
+                            stats.MP7Assists++;
+                            _logger.LogStatsUpdate(assisterName, "MP7 Assists", stats.MP7Assists);
+                            break;
+                        case "ump45":
+                            stats.UMP45Assists++;
+                            _logger.LogStatsUpdate(assisterName, "UMP45 Assists", stats.UMP45Assists);
+                            break;
+                        case "p90":
+                            stats.P90Assists++;
+                            _logger.LogStatsUpdate(assisterName, "P90 Assists", stats.P90Assists);
+                            break;
+                        case "bizon":
+                            stats.BizonAssists++;
+                            _logger.LogStatsUpdate(assisterName, "Bizon Assists", stats.BizonAssists);
+                            break;
+                        case "negev":
+                            stats.NegevAssists++;
+                            _logger.LogStatsUpdate(assisterName, "Negev Assists", stats.NegevAssists);
+                            break;
+                        case "m249":
+                            stats.M249Assists++;
+                            _logger.LogStatsUpdate(assisterName, "M249 Assists", stats.M249Assists);
+                            break;
                         // ... más armas según sea necesario
                     }
                     
@@ -958,8 +1246,280 @@ namespace AdvancedStatistics.Services
                                     TotalRoundsPlayed = originalStats.TotalRoundsPlayed,
                                     TotalDamageDone = originalStats.TotalDamageDone,
                                     TotalDamageTaken = originalStats.TotalDamageTaken,
-                                    LastUpdated = DateTime.UtcNow
                                     // Copiar todas las demás propiedades según sea necesario
+                                    AK47Kills = originalStats.AK47Kills,
+                                    M4A4Kills = originalStats.M4A4Kills,
+                                    M4A1SKills = originalStats.M4A1SKills,
+                                    AUGKills = originalStats.AUGKills,
+                                    SG553Kills = originalStats.SG553Kills,
+                                    GalilARKills = originalStats.GalilARKills,
+                                    FAMASKills = originalStats.FAMASKills,
+                                    AWPKills = originalStats.AWPKills,
+                                    ScoutKills = originalStats.ScoutKills,
+                                    Scar20Kills = originalStats.Scar20Kills,
+                                    G3SG1Kills = originalStats.G3SG1Kills,
+                                    SSG08Kills = originalStats.SSG08Kills,
+                                    DeagleKills = originalStats.DeagleKills,
+                                    GlockKills = originalStats.GlockKills,
+                                    USPSKills = originalStats.USPSKills,
+                                    P250Kills = originalStats.P250Kills,
+                                    P2000Kills = originalStats.P2000Kills,
+                                    FiveSevenKills = originalStats.FiveSevenKills,
+                                    Tec9Kills = originalStats.Tec9Kills,
+                                    CZ75Kills = originalStats.CZ75Kills,
+                                    DualiesKills = originalStats.DualiesKills,
+                                    RevolverKills = originalStats.RevolverKills,
+                                    NovaKills = originalStats.NovaKills,
+                                    XM1014Kills = originalStats.XM1014Kills,
+                                    SawedOffKills = originalStats.SawedOffKills,
+                                    MAG7Kills = originalStats.MAG7Kills,
+                                    Mac10Kills = originalStats.Mac10Kills,
+                                    MP9Kills = originalStats.MP9Kills,
+                                    MP7Kills = originalStats.MP7Kills,
+                                    UMP45Kills = originalStats.UMP45Kills,
+                                    P90Kills = originalStats.P90Kills,
+                                    BizonKills = originalStats.BizonKills,
+                                    NegevKills = originalStats.NegevKills,
+                                    M249Kills = originalStats.M249Kills,
+                                    AK47Deaths = originalStats.AK47Deaths,
+                                    M4A4Deaths = originalStats.M4A4Deaths,
+                                    M4A1SDeaths = originalStats.M4A1SDeaths,
+                                    AUGDeaths = originalStats.AUGDeaths,
+                                    SG553Deaths = originalStats.SG553Deaths,
+                                    GalilARDeaths = originalStats.GalilARDeaths,
+                                    FAMASDeaths = originalStats.FAMASDeaths,
+                                    AWPDeaths = originalStats.AWPDeaths,
+                                    ScoutDeaths = originalStats.ScoutDeaths,
+                                    Scar20Deaths = originalStats.Scar20Deaths,
+                                    G3SG1Deaths = originalStats.G3SG1Deaths,
+                                    SSG08Deaths = originalStats.SSG08Deaths,
+                                    DeagleDeaths = originalStats.DeagleDeaths,
+                                    GlockDeaths = originalStats.GlockDeaths,
+                                    USPSDeaths = originalStats.USPSDeaths,
+                                    P250Deaths = originalStats.P250Deaths,
+                                    P2000Deaths = originalStats.P2000Deaths,
+                                    FiveSevenDeaths = originalStats.FiveSevenDeaths,
+                                    Tec9Deaths = originalStats.Tec9Deaths,
+                                    CZ75Deaths = originalStats.CZ75Deaths,
+                                    DualiesDeaths = originalStats.DualiesDeaths,
+                                    RevolverDeaths = originalStats.RevolverDeaths,
+                                    NovaDeaths = originalStats.NovaDeaths,
+                                    XM1014Deaths = originalStats.XM1014Deaths,
+                                    SawedOffDeaths = originalStats.SawedOffDeaths,
+                                    MAG7Deaths = originalStats.MAG7Deaths,
+                                    Mac10Deaths = originalStats.Mac10Deaths,
+                                    MP9Deaths = originalStats.MP9Deaths,
+                                    MP7Deaths = originalStats.MP7Deaths,
+                                    UMP45Deaths = originalStats.UMP45Deaths,
+                                    P90Deaths = originalStats.P90Deaths,
+                                    BizonDeaths = originalStats.BizonDeaths,
+                                    NegevDeaths = originalStats.NegevDeaths,
+                                    M249Deaths = originalStats.M249Deaths,
+                                    AK47Assists = originalStats.AK47Assists,
+                                    M4A4Assists = originalStats.M4A4Assists,
+                                    M4A1SAssists = originalStats.M4A1SAssists,
+                                    AUGAssists = originalStats.AUGAssists,
+                                    SG553Assists = originalStats.SG553Assists,
+                                    GalilARAssists = originalStats.GalilARAssists,
+                                    FAMASAssists = originalStats.FAMASAssists,
+                                    AWPAssists = originalStats.AWPAssists,
+                                    ScoutAssists = originalStats.ScoutAssists,
+                                    Scar20Assists = originalStats.Scar20Assists,
+                                    G3SG1Assists = originalStats.G3SG1Assists,
+                                    SSG08Assists = originalStats.SSG08Assists,
+                                    DeagleAssists = originalStats.DeagleAssists,
+                                    GlockAssists = originalStats.GlockAssists,
+                                    USPSAssists = originalStats.USPSAssists,
+                                    P250Assists = originalStats.P250Assists,
+                                    P2000Assists = originalStats.P2000Assists,
+                                    FiveSevenAssists = originalStats.FiveSevenAssists,
+                                    Tec9Assists = originalStats.Tec9Assists,
+                                    CZ75Assists = originalStats.CZ75Assists,
+                                    DualiesAssists = originalStats.DualiesAssists,
+                                    RevolverAssists = originalStats.RevolverAssists,
+                                    NovaAssists = originalStats.NovaAssists,
+                                    XM1014Assists = originalStats.XM1014Assists,
+                                    SawedOffAssists = originalStats.SawedOffAssists,
+                                    MAG7Assists = originalStats.MAG7Assists,
+                                    Mac10Assists = originalStats.Mac10Assists,
+                                    MP9Assists = originalStats.MP9Assists,
+                                    MP7Assists = originalStats.MP7Assists,
+                                    UMP45Assists = originalStats.UMP45Assists,
+                                    P90Assists = originalStats.P90Assists,
+                                    BizonAssists = originalStats.BizonAssists,
+                                    NegevAssists = originalStats.NegevAssists,
+                                    M249Assists = originalStats.M249Assists,
+                                    AK47Headshots = originalStats.AK47Headshots,
+                                    M4A4Headshots = originalStats.M4A4Headshots,
+                                    M4A1SHeadshots = originalStats.M4A1SHeadshots,
+                                    AUGHeadshots = originalStats.AUGHeadshots,
+                                    SG553Headshots = originalStats.SG553Headshots,
+                                    GalilARHeadshots = originalStats.GalilARHeadshots,
+                                    FAMASHeadshots = originalStats.FAMASHeadshots,
+                                    AWPHeadshots = originalStats.AWPHeadshots,
+                                    ScoutHeadshots = originalStats.ScoutHeadshots,
+                                    Scar20Headshots = originalStats.Scar20Headshots,
+                                    G3SG1Headshots = originalStats.G3SG1Headshots,
+                                    SSG08Headshots = originalStats.SSG08Headshots,
+                                    DeagleHeadshots = originalStats.DeagleHeadshots,
+                                    GlockHeadshots = originalStats.GlockHeadshots,
+                                    USPSHeadshots = originalStats.USPSHeadshots,
+                                    P250Headshots = originalStats.P250Headshots,
+                                    P2000Headshots = originalStats.P2000Headshots,
+                                    FiveSevenHeadshots = originalStats.FiveSevenHeadshots,
+                                    Tec9Headshots = originalStats.Tec9Headshots,
+                                    CZ75Headshots = originalStats.CZ75Headshots,
+                                    DualiesHeadshots = originalStats.DualiesHeadshots,
+                                    RevolverHeadshots = originalStats.RevolverHeadshots,
+                                    NovaHeadshots = originalStats.NovaHeadshots,
+                                    XM1014Headshots = originalStats.XM1014Headshots,
+                                    SawedOffHeadshots = originalStats.SawedOffHeadshots,
+                                    MAG7Headshots = originalStats.MAG7Headshots,
+                                    Mac10Headshots = originalStats.Mac10Headshots,
+                                    MP9Headshots = originalStats.MP9Headshots,
+                                    MP7Headshots = originalStats.MP7Headshots,
+                                    UMP45Headshots = originalStats.UMP45Headshots,
+                                    P90Headshots = originalStats.P90Headshots,
+                                    BizonHeadshots = originalStats.BizonHeadshots,
+                                    NegevHeadshots = originalStats.NegevHeadshots,
+                                    M249Headshots = originalStats.M249Headshots,
+                                    AK47Chestshots = originalStats.AK47Chestshots,
+                                    M4A4Chestshots = originalStats.M4A4Chestshots,
+                                    M4A1SChestshots = originalStats.M4A1SChestshots,
+                                    AUGChestshots = originalStats.AUGChestshots,
+                                    SG553Chestshots = originalStats.SG553Chestshots,
+                                    GalilARChestshots = originalStats.GalilARChestshots,
+                                    FAMASChestshots = originalStats.FAMASChestshots,
+                                    AWPChestshots = originalStats.AWPChestshots,
+                                    ScoutChestshots = originalStats.ScoutChestshots,
+                                    Scar20Chestshots = originalStats.Scar20Chestshots,
+                                    G3SG1Chestshots = originalStats.G3SG1Chestshots,
+                                    SSG08Chestshots = originalStats.SSG08Chestshots,
+                                    DeagleChestshots = originalStats.DeagleChestshots,
+                                    GlockChestshots = originalStats.GlockChestshots,
+                                    USPSChestshots = originalStats.USPSChestshots,
+                                    P250Chestshots = originalStats.P250Chestshots,
+                                    P2000Chestshots = originalStats.P2000Chestshots,
+                                    FiveSevenChestshots = originalStats.FiveSevenChestshots,
+                                    Tec9Chestshots = originalStats.Tec9Chestshots,
+                                    CZ75Chestshots = originalStats.CZ75Chestshots,
+                                    DualiesChestshots = originalStats.DualiesChestshots,
+                                    RevolverChestshots = originalStats.RevolverChestshots,
+                                    NovaChestshots = originalStats.NovaChestshots,
+                                    XM1014Chestshots = originalStats.XM1014Chestshots,
+                                    SawedOffChestshots = originalStats.SawedOffChestshots,
+                                    MAG7Chestshots = originalStats.MAG7Chestshots,
+                                    Mac10Chestshots = originalStats.Mac10Chestshots,
+                                    MP9Chestshots = originalStats.MP9Chestshots,
+                                    MP7Chestshots = originalStats.MP7Chestshots,
+                                    UMP45Chestshots = originalStats.UMP45Chestshots,
+                                    P90Chestshots = originalStats.P90Chestshots,
+                                    BizonChestshots = originalStats.BizonChestshots,
+                                    NegevChestshots = originalStats.NegevChestshots,
+                                    M249Chestshots = originalStats.M249Chestshots,
+                                    AK47Stomachshots = originalStats.AK47Stomachshots,
+                                    M4A4Stomachshots = originalStats.M4A4Stomachshots,
+                                    M4A1SStomachshots = originalStats.M4A1SStomachshots,
+                                    AUGStomachshots = originalStats.AUGStomachshots,
+                                    SG553Stomachshots = originalStats.SG553Stomachshots,
+                                    GalilARStomachshots = originalStats.GalilARStomachshots,
+                                    FAMASStomachshots = originalStats.FAMASStomachshots,
+                                    AWPStomachshots = originalStats.AWPStomachshots,
+                                    ScoutStomachshots = originalStats.ScoutStomachshots,
+                                    Scar20Stomachshots = originalStats.Scar20Stomachshots,
+                                    G3SG1Stomachshots = originalStats.G3SG1Stomachshots,
+                                    SSG08Stomachshots = originalStats.SSG08Stomachshots,
+                                    DeagleStomachshots = originalStats.DeagleStomachshots,
+                                    GlockStomachshots = originalStats.GlockStomachshots,
+                                    USPSStomachshots = originalStats.USPSStomachshots,
+                                    P250Stomachshots = originalStats.P250Stomachshots,
+                                    P2000Stomachshots = originalStats.P2000Stomachshots,
+                                    FiveSevenStomachshots = originalStats.FiveSevenStomachshots,
+                                    Tec9Stomachshots = originalStats.Tec9Stomachshots,
+                                    CZ75Stomachshots = originalStats.CZ75Stomachshots,
+                                    DualiesStomachshots = originalStats.DualiesStomachshots,
+                                    RevolverStomachshots = originalStats.RevolverStomachshots,
+                                    NovaStomachshots = originalStats.NovaStomachshots,
+                                    XM1014Stomachshots = originalStats.XM1014Stomachshots,
+                                    SawedOffStomachshots = originalStats.SawedOffStomachshots,
+                                    MAG7Stomachshots = originalStats.MAG7Stomachshots,
+                                    Mac10Stomachshots = originalStats.Mac10Stomachshots,
+                                    MP9Stomachshots = originalStats.MP9Stomachshots,
+                                    MP7Stomachshots = originalStats.MP7Stomachshots,
+                                    UMP45Stomachshots = originalStats.UMP45Stomachshots,
+                                    P90Stomachshots = originalStats.P90Stomachshots,
+                                    BizonStomachshots = originalStats.BizonStomachshots,
+                                    NegevStomachshots = originalStats.NegevStomachshots,
+                                    M249Stomachshots = originalStats.M249Stomachshots,
+                                    AK47LeftLegshots = originalStats.AK47LeftLegshots,
+                                    M4A4LeftLegshots = originalStats.M4A4LeftLegshots,
+                                    M4A1SLeftLegshots = originalStats.M4A1SLeftLegshots,
+                                    AUGLeftLegshots = originalStats.AUGLeftLegshots,
+                                    SG553LeftLegshots = originalStats.SG553LeftLegshots,
+                                    GalilARLeftLegshots = originalStats.GalilARLeftLegshots,
+                                    FAMASLeftLegshots = originalStats.FAMASLeftLegshots,
+                                    AWPLeftLegshots = originalStats.AWPLeftLegshots,
+                                    ScoutLeftLegshots = originalStats.ScoutLeftLegshots,
+                                    Scar20LeftLegshots = originalStats.Scar20LeftLegshots,
+                                    G3SG1LeftLegshots = originalStats.G3SG1LeftLegshots,
+                                    SSG08LeftLegshots = originalStats.SSG08LeftLegshots,
+                                    DeagleLeftLegshots = originalStats.DeagleLeftLegshots,
+                                    GlockLeftLegshots = originalStats.GlockLeftLegshots,
+                                    USPSLeftLegshots = originalStats.USPSLeftLegshots,
+                                    P250LeftLegshots = originalStats.P250LeftLegshots,
+                                    P2000LeftLegshots = originalStats.P2000LeftLegshots,
+                                    FiveSevenLeftLegshots = originalStats.FiveSevenLeftLegshots,
+                                    Tec9LeftLegshots = originalStats.Tec9LeftLegshots,
+                                    CZ75LeftLegshots = originalStats.CZ75LeftLegshots,
+                                    DualiesLeftLegshots = originalStats.DualiesLeftLegshots,
+                                    RevolverLeftLegshots = originalStats.RevolverLeftLegshots,
+                                    NovaLeftLegshots = originalStats.NovaLeftLegshots,
+                                    XM1014LeftLegshots = originalStats.XM1014LeftLegshots,
+                                    SawedOffLeftLegshots = originalStats.SawedOffLeftLegshots,
+                                    MAG7LeftLegshots = originalStats.MAG7LeftLegshots,
+                                    Mac10LeftLegshots = originalStats.Mac10LeftLegshots,
+                                    MP9LeftLegshots = originalStats.MP9LeftLegshots,
+                                    MP7LeftLegshots = originalStats.MP7LeftLegshots,
+                                    UMP45LeftLegshots = originalStats.UMP45LeftLegshots,
+                                    P90LeftLegshots = originalStats.P90LeftLegshots,
+                                    BizonLeftLegshots = originalStats.BizonLeftLegshots,
+                                    NegevLeftLegshots = originalStats.NegevLeftLegshots,
+                                    M249LeftLegshots = originalStats.M249LeftLegshots,
+                                    AK47RightLegshots = originalStats.AK47RightLegshots,
+                                    M4A4RightLegshots = originalStats.M4A4RightLegshots,
+                                    M4A1SRightLegshots = originalStats.M4A1SRightLegshots,
+                                    AUGRightLegshots = originalStats.AUGRightLegshots,
+                                    SG553RightLegshots = originalStats.SG553RightLegshots,
+                                    GalilARRightLegshots = originalStats.GalilARRightLegshots,
+                                    FAMASRightLegshots = originalStats.FAMASRightLegshots,
+                                    AWPRightLegshots = originalStats.AWPRightLegshots,
+                                    ScoutRightLegshots = originalStats.ScoutRightLegshots,
+                                    Scar20RightLegshots = originalStats.Scar20RightLegshots,
+                                    G3SG1RightLegshots = originalStats.G3SG1RightLegshots,
+                                    SSG08RightLegshots = originalStats.SSG08RightLegshots,
+                                    DeagleRightLegshots = originalStats.DeagleRightLegshots,
+                                    GlockRightLegshots = originalStats.GlockRightLegshots,
+                                    USPSRightLegshots = originalStats.USPSRightLegshots,
+                                    P250RightLegshots = originalStats.P250RightLegshots,
+                                    P2000RightLegshots = originalStats.P2000RightLegshots,
+                                    FiveSevenRightLegshots = originalStats.FiveSevenRightLegshots,
+                                    Tec9RightLegshots = originalStats.Tec9RightLegshots,
+                                    CZ75RightLegshots = originalStats.CZ75RightLegshots,
+                                    DualiesRightLegshots = originalStats.DualiesRightLegshots,
+                                    RevolverRightLegshots = originalStats.RevolverRightLegshots,
+                                    NovaRightLegshots = originalStats.NovaRightLegshots,
+                                    XM1014RightLegshots = originalStats.XM1014RightLegshots,
+                                    SawedOffRightLegshots = originalStats.SawedOffRightLegshots,
+                                    MAG7RightLegshots = originalStats.MAG7RightLegshots,
+                                    Mac10RightLegshots = originalStats.Mac10RightLegshots,
+                                    MP9RightLegshots = originalStats.MP9RightLegshots,
+                                    MP7RightLegshots = originalStats.MP7RightLegshots,
+                                    UMP45RightLegshots = originalStats.UMP45RightLegshots,
+                                    P90RightLegshots = originalStats.P90RightLegshots,
+                                    BizonRightLegshots = originalStats.BizonRightLegshots,
+                                    NegevRightLegshots = originalStats.NegevRightLegshots,
+                                    M249RightLegshots = originalStats.M249RightLegshots,
+                                    LastUpdated = DateTime.UtcNow
                                 };
                                 
                                 cachedStatsCopy[steamId] = statsCopy;

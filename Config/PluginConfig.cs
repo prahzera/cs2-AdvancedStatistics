@@ -23,6 +23,9 @@ namespace AdvancedStatistics.Config
         [JsonPropertyName("TrackBotEvents")]
         public bool TrackBotEvents { get; set; } = false;
 
+        [JsonPropertyName("TrackWarmupEvents")]
+        public bool TrackWarmupEvents { get; set; } = false;
+
         [JsonPropertyName("UpdateInterval")]
         public int UpdateInterval { get; set; } = 30;
 
