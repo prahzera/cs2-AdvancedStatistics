@@ -1,0 +1,9 @@
+<Project>
+  <PropertyGroup>
+    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageVersion Include="CounterStrikeSharp.API" Version="1.0.142" />
+    <PackageVersion Include="MySql.Data" Version="8.0.33" />
+  </ItemGroup>
+</Project>
