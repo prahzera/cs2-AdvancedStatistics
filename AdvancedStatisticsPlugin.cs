@@ -5,6 +5,7 @@ using AdvancedStatistics.Database;
 using AdvancedStatistics.Services;
 using AdvancedStatistics.Events;
 using AdvancedStatistics.Commands;
+using AdvancedStatistics.Utils;
 using CounterStrikeSharp.API.Modules.Config;
 
 namespace AdvancedStatistics
@@ -20,6 +21,7 @@ namespace AdvancedStatistics
         private StatsService _statsService = null!;
         private WeaponTrackingEvents _weaponTrackingEvents = null!;
         private StatsCommands _statsCommands = null!;
+        private Logger _logger = null!;
 
         public override void Load(bool hotReload)
         {
@@ -28,17 +30,26 @@ namespace AdvancedStatistics
             // el archivo de configuración en la primera ejecución si no existe
             _config = ConfigManager.Load<PluginConfig>(ModuleName);
             
+            // Inicializar logger
+            _logger = new Logger(_config);
+            _logger.SetLogger(Logger);
+            MainThreadDispatcher.SetLogger(Logger);
+            
             // Inicializar componentes
             _databaseManager = new DatabaseManager(_config);
-            _statsService = new StatsService(_databaseManager);
+            _databaseManager.SetLogger(Logger);
+            _statsService = new StatsService(_databaseManager, _logger);
             _statsService.SetLogger(Logger);
             
+            // Inicializar la base de datos (crear tabla si no existe)
+            _ = InitializeDatabaseAsync();
+            
             // Inicializar eventos
-            _weaponTrackingEvents = new WeaponTrackingEvents(_statsService);
+            _weaponTrackingEvents = new WeaponTrackingEvents(_statsService, _logger);
             _weaponTrackingEvents.SetLogger(Logger);
             
             // Inicializar comandos
-            _statsCommands = new StatsCommands(_statsService);
+            _statsCommands = new StatsCommands(_statsService, _logger);
             _statsCommands.SetLogger(Logger);
             
             // Registrar eventos
@@ -48,12 +59,28 @@ namespace AdvancedStatistics
             RegisterEventHandler<EventPlayerConnectFull>(_weaponTrackingEvents.OnPlayerConnectFull);
             RegisterEventHandler<EventPlayerDisconnect>(_weaponTrackingEvents.OnPlayerDisconnect);
             
+            // Registrar tick listener para procesar la cola de acciones en el hilo principal
+            RegisterListener<CounterStrikeSharp.API.Core.Listeners.OnTick>(MainThreadDispatcher.ProcessQueue);
+            
             // Registrar comandos
             AddCommand("css_stats", "Muestra las estadísticas del jugador", _statsCommands.OnStatsCommand);
             AddCommand("css_topstats", "Muestra las mejores estadísticas", _statsCommands.OnTopStatsCommand);
             AddCommand("css_resetstats", "Reinicia las estadísticas (solo admin)", _statsCommands.OnResetStatsCommand);
             
             Logger.LogInformation("Advanced Statistics plugin loaded successfully.");
+        }
+
+        private async Task InitializeDatabaseAsync()
+        {
+            try
+            {
+                await _statsService.InitializeAsync();
+                Logger.LogInformation("[Advanced Statistics] Database initialized successfully.");
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError($"[Advanced Statistics] Failed to initialize database: {ex.Message}");
+            }
         }
 
         public override void Unload(bool hotReload)

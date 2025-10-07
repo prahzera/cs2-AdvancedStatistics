@@ -2,6 +2,7 @@ using System.Data;
 using MySqlConnector;
 using AdvancedStatistics.Config;
 using AdvancedStatistics.Models;
+using AdvancedStatistics.Utils;
 using Microsoft.Extensions.Logging;
 
 namespace AdvancedStatistics.Database
@@ -31,11 +32,17 @@ namespace AdvancedStatistics.Database
             {
                 using var connection = new MySqlConnection(_connectionString);
                 await connection.OpenAsync();
+                _logger?.LogInformation("[Advanced Statistics] Database connection successful");
                 return true;
             }
             catch (Exception ex)
             {
-                _logger?.LogError($"Database connection failed: {ex.Message}");
+                _logger?.LogError($"[Advanced Statistics] Database connection failed: {ex.Message}");
+                _logger?.LogError($"[Advanced Statistics] Exception type: {ex.GetType().FullName}");
+                if (ex.InnerException != null)
+                {
+                    _logger?.LogError($"[Advanced Statistics] Inner exception: {ex.InnerException.Message}");
+                }
                 return false;
             }
         }
@@ -44,6 +51,19 @@ namespace AdvancedStatistics.Database
         {
             try
             {
+                _logger?.LogInformation("[Advanced Statistics] Starting database initialization...");
+                
+                // Probar la conexión primero
+                bool connectionSuccess = await TestConnectionAsync();
+                if (!connectionSuccess)
+                {
+                    _logger?.LogError("[Advanced Statistics] Failed to connect to database. Aborting initialization.");
+                    throw new Exception("Failed to connect to database");
+                }
+                
+                _logger?.LogInformation("[Advanced Statistics] Database connection established. Creating table structure...");
+                
+                // Crear la tabla principal con columnas básicas primero
                 string createTableQuery = @"
                     CREATE TABLE IF NOT EXISTS player_stats (
                         id INT AUTO_INCREMENT PRIMARY KEY,
@@ -56,293 +76,591 @@ namespace AdvancedStatistics.Database
                         total_rounds_played INT DEFAULT 0,
                         total_damage_done INT DEFAULT 0,
                         total_damage_taken INT DEFAULT 0,
-                        ak47_kills INT DEFAULT 0,
-                        m4a4_kills INT DEFAULT 0,
-                        m4a1s_kills INT DEFAULT 0,
-                        aug_kills INT DEFAULT 0,
-                        sg553_kills INT DEFAULT 0,
-                        galilar_kills INT DEFAULT 0,
-                        famas_kills INT DEFAULT 0,
-                        awp_kills INT DEFAULT 0,
-                        scout_kills INT DEFAULT 0,
-                        scar20_kills INT DEFAULT 0,
-                        g3sg1_kills INT DEFAULT 0,
-                        ssg08_kills INT DEFAULT 0,
-                        deagle_kills INT DEFAULT 0,
-                        glock_kills INT DEFAULT 0,
-                        usps_kills INT DEFAULT 0,
-                        p250_kills INT DEFAULT 0,
-                        p2000_kills INT DEFAULT 0,
-                        fiveseven_kills INT DEFAULT 0,
-                        tec9_kills INT DEFAULT 0,
-                        cz75_kills INT DEFAULT 0,
-                        dualies_kills INT DEFAULT 0,
-                        revolver_kills INT DEFAULT 0,
-                        nova_kills INT DEFAULT 0,
-                        xm1014_kills INT DEFAULT 0,
-                        sawedoff_kills INT DEFAULT 0,
-                        mag7_kills INT DEFAULT 0,
-                        mac10_kills INT DEFAULT 0,
-                        mp9_kills INT DEFAULT 0,
-                        mp7_kills INT DEFAULT 0,
-                        ump45_kills INT DEFAULT 0,
-                        p90_kills INT DEFAULT 0,
-                        bizon_kills INT DEFAULT 0,
-                        negev_kills INT DEFAULT 0,
-                        m249_kills INT DEFAULT 0,
-                        ak47_deaths INT DEFAULT 0,
-                        m4a4_deaths INT DEFAULT 0,
-                        m4a1s_deaths INT DEFAULT 0,
-                        aug_deaths INT DEFAULT 0,
-                        sg553_deaths INT DEFAULT 0,
-                        galilar_deaths INT DEFAULT 0,
-                        famas_deaths INT DEFAULT 0,
-                        awp_deaths INT DEFAULT 0,
-                        scout_deaths INT DEFAULT 0,
-                        scar20_deaths INT DEFAULT 0,
-                        g3sg1_deaths INT DEFAULT 0,
-                        ssg08_deaths INT DEFAULT 0,
-                        deagle_deaths INT DEFAULT 0,
-                        glock_deaths INT DEFAULT 0,
-                        usps_deaths INT DEFAULT 0,
-                        p250_deaths INT DEFAULT 0,
-                        p2000_deaths INT DEFAULT 0,
-                        fiveseven_deaths INT DEFAULT 0,
-                        tec9_deaths INT DEFAULT 0,
-                        cz75_deaths INT DEFAULT 0,
-                        dualies_deaths INT DEFAULT 0,
-                        revolver_deaths INT DEFAULT 0,
-                        nova_deaths INT DEFAULT 0,
-                        xm1014_deaths INT DEFAULT 0,
-                        sawedoff_deaths INT DEFAULT 0,
-                        mag7_deaths INT DEFAULT 0,
-                        mac10_deaths INT DEFAULT 0,
-                        mp9_deaths INT DEFAULT 0,
-                        mp7_deaths INT DEFAULT 0,
-                        ump45_deaths INT DEFAULT 0,
-                        p90_deaths INT DEFAULT 0,
-                        bizon_deaths INT DEFAULT 0,
-                        negev_deaths INT DEFAULT 0,
-                        m249_deaths INT DEFAULT 0,
-                        ak47_assists INT DEFAULT 0,
-                        m4a4_assists INT DEFAULT 0,
-                        m4a1s_assists INT DEFAULT 0,
-                        aug_assists INT DEFAULT 0,
-                        sg553_assists INT DEFAULT 0,
-                        galilar_assists INT DEFAULT 0,
-                        famas_assists INT DEFAULT 0,
-                        awp_assists INT DEFAULT 0,
-                        scout_assists INT DEFAULT 0,
-                        scar20_assists INT DEFAULT 0,
-                        g3sg1_assists INT DEFAULT 0,
-                        ssg08_assists INT DEFAULT 0,
-                        deagle_assists INT DEFAULT 0,
-                        glock_assists INT DEFAULT 0,
-                        usps_assists INT DEFAULT 0,
-                        p250_assists INT DEFAULT 0,
-                        p2000_assists INT DEFAULT 0,
-                        fiveseven_assists INT DEFAULT 0,
-                        tec9_assists INT DEFAULT 0,
-                        cz75_assists INT DEFAULT 0,
-                        dualies_assists INT DEFAULT 0,
-                        revolver_assists INT DEFAULT 0,
-                        nova_assists INT DEFAULT 0,
-                        xm1014_assists INT DEFAULT 0,
-                        sawedoff_assists INT DEFAULT 0,
-                        mag7_assists INT DEFAULT 0,
-                        mac10_assists INT DEFAULT 0,
-                        mp9_assists INT DEFAULT 0,
-                        mp7_assists INT DEFAULT 0,
-                        ump45_assists INT DEFAULT 0,
-                        p90_assists INT DEFAULT 0,
-                        bizon_assists INT DEFAULT 0,
-                        negev_assists INT DEFAULT 0,
-                        m249_assists INT DEFAULT 0,
-                        ak47_headshots INT DEFAULT 0,
-                        m4a4_headshots INT DEFAULT 0,
-                        m4a1s_headshots INT DEFAULT 0,
-                        aug_headshots INT DEFAULT 0,
-                        sg553_headshots INT DEFAULT 0,
-                        galilar_headshots INT DEFAULT 0,
-                        famas_headshots INT DEFAULT 0,
-                        awp_headshots INT DEFAULT 0,
-                        scout_headshots INT DEFAULT 0,
-                        scar20_headshots INT DEFAULT 0,
-                        g3sg1_headshots INT DEFAULT 0,
-                        ssg08_headshots INT DEFAULT 0,
-                        deagle_headshots INT DEFAULT 0,
-                        glock_headshots INT DEFAULT 0,
-                        usps_headshots INT DEFAULT 0,
-                        p250_headshots INT DEFAULT 0,
-                        p2000_headshots INT DEFAULT 0,
-                        fiveseven_headshots INT DEFAULT 0,
-                        tec9_headshots INT DEFAULT 0,
-                        cz75_headshots INT DEFAULT 0,
-                        dualies_headshots INT DEFAULT 0,
-                        revolver_headshots INT DEFAULT 0,
-                        nova_headshots INT DEFAULT 0,
-                        xm1014_headshots INT DEFAULT 0,
-                        sawedoff_headshots INT DEFAULT 0,
-                        mag7_headshots INT DEFAULT 0,
-                        mac10_headshots INT DEFAULT 0,
-                        mp9_headshots INT DEFAULT 0,
-                        mp7_headshots INT DEFAULT 0,
-                        ump45_headshots INT DEFAULT 0,
-                        p90_headshots INT DEFAULT 0,
-                        bizon_headshots INT DEFAULT 0,
-                        negev_headshots INT DEFAULT 0,
-                        m249_headshots INT DEFAULT 0,
-                        ak47_chestshots INT DEFAULT 0,
-                        m4a4_chestshots INT DEFAULT 0,
-                        m4a1s_chestshots INT DEFAULT 0,
-                        aug_chestshots INT DEFAULT 0,
-                        sg553_chestshots INT DEFAULT 0,
-                        galilar_chestshots INT DEFAULT 0,
-                        famas_chestshots INT DEFAULT 0,
-                        awp_chestshots INT DEFAULT 0,
-                        scout_chestshots INT DEFAULT 0,
-                        scar20_chestshots INT DEFAULT 0,
-                        g3sg1_chestshots INT DEFAULT 0,
-                        ssg08_chestshots INT DEFAULT 0,
-                        deagle_chestshots INT DEFAULT 0,
-                        glock_chestshots INT DEFAULT 0,
-                        usps_chestshots INT DEFAULT 0,
-                        p250_chestshots INT DEFAULT 0,
-                        p2000_chestshots INT DEFAULT 0,
-                        fiveseven_chestshots INT DEFAULT 0,
-                        tec9_chestshots INT DEFAULT 0,
-                        cz75_chestshots INT DEFAULT 0,
-                        dualies_chestshots INT DEFAULT 0,
-                        revolver_chestshots INT DEFAULT 0,
-                        nova_chestshots INT DEFAULT 0,
-                        xm1014_chestshots INT DEFAULT 0,
-                        sawedoff_chestshots INT DEFAULT 0,
-                        mag7_chestshots INT DEFAULT 0,
-                        mac10_chestshots INT DEFAULT 0,
-                        mp9_chestshots INT DEFAULT 0,
-                        mp7_chestshots INT DEFAULT 0,
-                        ump45_chestshots INT DEFAULT 0,
-                        p90_chestshots INT DEFAULT 0,
-                        bizon_chestshots INT DEFAULT 0,
-                        negev_chestshots INT DEFAULT 0,
-                        m249_chestshots INT DEFAULT 0,
-                        ak47_stomachshots INT DEFAULT 0,
-                        m4a4_stomachshots INT DEFAULT 0,
-                        m4a1s_stomachshots INT DEFAULT 0,
-                        aug_stomachshots INT DEFAULT 0,
-                        sg553_stomachshots INT DEFAULT 0,
-                        galilar_stomachshots INT DEFAULT 0,
-                        famas_stomachshots INT DEFAULT 0,
-                        awp_stomachshots INT DEFAULT 0,
-                        scout_stomachshots INT DEFAULT 0,
-                        scar20_stomachshots INT DEFAULT 0,
-                        g3sg1_stomachshots INT DEFAULT 0,
-                        ssg08_stomachshots INT DEFAULT 0,
-                        deagle_stomachshots INT DEFAULT 0,
-                        glock_stomachshots INT DEFAULT 0,
-                        usps_stomachshots INT DEFAULT 0,
-                        p250_stomachshots INT DEFAULT 0,
-                        p2000_stomachshots INT DEFAULT 0,
-                        fiveseven_stomachshots INT DEFAULT 0,
-                        tec9_stomachshots INT DEFAULT 0,
-                        cz75_stomachshots INT DEFAULT 0,
-                        dualies_stomachshots INT DEFAULT 0,
-                        revolver_stomachshots INT DEFAULT 0,
-                        nova_stomachshots INT DEFAULT 0,
-                        xm1014_stomachshots INT DEFAULT 0,
-                        sawedoff_stomachshots INT DEFAULT 0,
-                        mag7_stomachshots INT DEFAULT 0,
-                        mac10_stomachshots INT DEFAULT 0,
-                        mp9_stomachshots INT DEFAULT 0,
-                        mp7_stomachshots INT DEFAULT 0,
-                        ump45_stomachshots INT DEFAULT 0,
-                        p90_stomachshots INT DEFAULT 0,
-                        bizon_stomachshots INT DEFAULT 0,
-                        negev_stomachshots INT DEFAULT 0,
-                        m249_stomachshots INT DEFAULT 0,
-                        ak47_leftlegshots INT DEFAULT 0,
-                        m4a4_leftlegshots INT DEFAULT 0,
-                        m4a1s_leftlegshots INT DEFAULT 0,
-                        aug_leftlegshots INT DEFAULT 0,
-                        sg553_leftlegshots INT DEFAULT 0,
-                        galilar_leftlegshots INT DEFAULT 0,
-                        famas_leftlegshots INT DEFAULT 0,
-                        awp_leftlegshots INT DEFAULT 0,
-                        scout_leftlegshots INT DEFAULT 0,
-                        scar20_leftlegshots INT DEFAULT 0,
-                        g3sg1_leftlegshots INT DEFAULT 0,
-                        ssg08_leftlegshots INT DEFAULT 0,
-                        deagle_leftlegshots INT DEFAULT 0,
-                        glock_leftlegshots INT DEFAULT 0,
-                        usps_leftlegshots INT DEFAULT 0,
-                        p250_leftlegshots INT DEFAULT 0,
-                        p2000_leftlegshots INT DEFAULT 0,
-                        fiveseven_leftlegshots INT DEFAULT 0,
-                        tec9_leftlegshots INT DEFAULT 0,
-                        cz75_leftlegshots INT DEFAULT 0,
-                        dualies_leftlegshots INT DEFAULT 0,
-                        revolver_leftlegshots INT DEFAULT 0,
-                        nova_leftlegshots INT DEFAULT 0,
-                        xm1014_leftlegshots INT DEFAULT 0,
-                        sawedoff_leftlegshots INT DEFAULT 0,
-                        mag7_leftlegshots INT DEFAULT 0,
-                        mac10_leftlegshots INT DEFAULT 0,
-                        mp9_leftlegshots INT DEFAULT 0,
-                        mp7_leftlegshots INT DEFAULT 0,
-                        ump45_leftlegshots INT DEFAULT 0,
-                        p90_leftlegshots INT DEFAULT 0,
-                        bizon_leftlegshots INT DEFAULT 0,
-                        negev_leftlegshots INT DEFAULT 0,
-                        m249_leftlegshots INT DEFAULT 0,
-                        ak47_rightlegshots INT DEFAULT 0,
-                        m4a4_rightlegshots INT DEFAULT 0,
-                        m4a1s_rightlegshots INT DEFAULT 0,
-                        aug_rightlegshots INT DEFAULT 0,
-                        sg553_rightlegshots INT DEFAULT 0,
-                        galilar_rightlegshots INT DEFAULT 0,
-                        famas_rightlegshots INT DEFAULT 0,
-                        awp_rightlegshots INT DEFAULT 0,
-                        scout_rightlegshots INT DEFAULT 0,
-                        scar20_rightlegshots INT DEFAULT 0,
-                        g3sg1_rightlegshots INT DEFAULT 0,
-                        ssg08_rightlegshots INT DEFAULT 0,
-                        deagle_rightlegshots INT DEFAULT 0,
-                        glock_rightlegshots INT DEFAULT 0,
-                        usps_rightlegshots INT DEFAULT 0,
-                        p250_rightlegshots INT DEFAULT 0,
-                        p2000_rightlegshots INT DEFAULT 0,
-                        fiveseven_rightlegshots INT DEFAULT 0,
-                        tec9_rightlegshots INT DEFAULT 0,
-                        cz75_rightlegshots INT DEFAULT 0,
-                        dualies_rightlegshots INT DEFAULT 0,
-                        revolver_rightlegshots INT DEFAULT 0,
-                        nova_rightlegshots INT DEFAULT 0,
-                        xm1014_rightlegshots INT DEFAULT 0,
-                        sawedoff_rightlegshots INT DEFAULT 0,
-                        mag7_rightlegshots INT DEFAULT 0,
-                        mac10_rightlegshots INT DEFAULT 0,
-                        mp9_rightlegshots INT DEFAULT 0,
-                        mp7_rightlegshots INT DEFAULT 0,
-                        ump45_rightlegshots INT DEFAULT 0,
-                        p90_rightlegshots INT DEFAULT 0,
-                        bizon_rightlegshots INT DEFAULT 0,
-                        negev_rightlegshots INT DEFAULT 0,
-                        m249_rightlegshots INT DEFAULT 0,
                         last_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
                         INDEX idx_steam_id (steam_id)
                     )";
 
                 using var connection = new MySqlConnection(_connectionString);
                 await connection.OpenAsync();
+                _logger?.LogInformation("[Advanced Statistics] Database connection opened for table creation");
                 
                 using var command = new MySqlCommand(createTableQuery, connection);
                 await command.ExecuteNonQueryAsync();
+                _logger?.LogInformation("[Advanced Statistics] Main player_stats table created or already exists");
                 
-                _logger?.LogInformation("Database initialized successfully");
+                // Agregar columnas adicionales por grupos para evitar problemas con consultas muy largas
+                await AddWeaponColumnsAsync(connection);
+                await AddDeathColumnsAsync(connection);
+                await AddAssistColumnsAsync(connection);
+                await AddHeadshotColumnsAsync(connection);
+                await AddChestshotColumnsAsync(connection);
+                await AddStomachshotColumnsAsync(connection);
+                await AddLegshotColumnsAsync(connection);
+                
+                _logger?.LogInformation("[Advanced Statistics] Database initialized successfully");
             }
             catch (Exception ex)
             {
-                _logger?.LogError($"Failed to initialize database: {ex.Message}");
+                _logger?.LogError($"[Advanced Statistics] Failed to initialize database: {ex.Message}");
+                _logger?.LogError($"[Advanced Statistics] Stack trace: {ex.StackTrace}");
+                throw;
+            }
+        }
+
+        private async Task AddAssistColumnsAsync(MySqlConnection connection)
+        {
+            try
+            {
+                _logger?.LogInformation("[Advanced Statistics] Adding assist columns...");
+                
+                // Columnas para asistencias por arma
+                string[] assistColumns = {
+                    "ak47_assists", "m4a4_assists", "m4a1s_assists", "aug_assists", "sg553_assists",
+                    "galilar_assists", "famas_assists", "awp_assists", "scout_assists", "scar20_assists",
+                    "g3sg1_assists", "ssg08_assists", "deagle_assists", "glock_assists", "usps_assists",
+                    "p250_assists", "p2000_assists", "fiveseven_assists", "tec9_assists", "cz75_assists",
+                    "dualies_assists", "revolver_assists", "nova_assists", "xm1014_assists", "sawedoff_assists",
+                    "mag7_assists", "mac10_assists", "mp9_assists", "mp7_assists", "ump45_assists",
+                    "p90_assists", "bizon_assists", "negev_assists", "m249_assists"
+                };
+
+                foreach (string column in assistColumns)
+                {
+                    // Verificar si la columna ya existe
+                    string checkColumnQuery = @"
+                        SELECT COUNT(*) 
+                        FROM INFORMATION_SCHEMA.COLUMNS 
+                        WHERE TABLE_SCHEMA = @databaseName 
+                        AND TABLE_NAME = 'player_stats' 
+                        AND COLUMN_NAME = @columnName";
+
+                    using var checkCommand = new MySqlCommand(checkColumnQuery, connection);
+                    checkCommand.Parameters.AddWithValue("@databaseName", _config.DatabaseName);
+                    checkCommand.Parameters.AddWithValue("@columnName", column);
+                    
+                    var result = await checkCommand.ExecuteScalarAsync();
+                    if (Convert.ToInt32(result) == 0)
+                    {
+                        // La columna no existe, crearla
+                        string addColumnQuery = $@"
+                            ALTER TABLE player_stats 
+                            ADD COLUMN {column} INT DEFAULT 0";
+                        
+                        using var command = new MySqlCommand(addColumnQuery, connection);
+                        await command.ExecuteNonQueryAsync();
+                        _logger?.LogInformation($"[Advanced Statistics] Added column {column}");
+                    }
+                }
+                
+                _logger?.LogInformation($"[Advanced Statistics] Added {assistColumns.Length} assist columns");
+            }
+            catch (Exception ex)
+            {
+                _logger?.LogError($"[Advanced Statistics] Failed to add assist columns: {ex.Message}");
+                throw;
+            }
+        }
+
+        private async Task AddStomachshotColumnsAsync(MySqlConnection connection)
+        {
+            try
+            {
+                _logger?.LogInformation("[Advanced Statistics] Adding stomachshot columns...");
+                
+                // Columnas para stomachshots por arma
+                string[] stomachshotColumns = {
+                    "ak47_stomachshots", "m4a4_stomachshots", "m4a1s_stomachshots", "aug_stomachshots", "sg553_stomachshots",
+                    "galilar_stomachshots", "famas_stomachshots", "awp_stomachshots", "scout_stomachshots", "scar20_stomachshots",
+                    "g3sg1_stomachshots", "ssg08_stomachshots", "deagle_stomachshots", "glock_stomachshots", "usps_stomachshots",
+                    "p250_stomachshots", "p2000_stomachshots", "fiveseven_stomachshots", "tec9_stomachshots", "cz75_stomachshots",
+                    "dualies_stomachshots", "revolver_stomachshots", "nova_stomachshots", "xm1014_stomachshots", "sawedoff_stomachshots",
+                    "mag7_stomachshots", "mac10_stomachshots", "mp9_stomachshots", "mp7_stomachshots", "ump45_stomachshots",
+                    "p90_stomachshots", "bizon_stomachshots", "negev_stomachshots", "m249_stomachshots"
+                };
+
+                foreach (string column in stomachshotColumns)
+                {
+                    // Verificar si la columna ya existe
+                    string checkColumnQuery = @"
+                        SELECT COUNT(*) 
+                        FROM INFORMATION_SCHEMA.COLUMNS 
+                        WHERE TABLE_SCHEMA = @databaseName 
+                        AND TABLE_NAME = 'player_stats' 
+                        AND COLUMN_NAME = @columnName";
+
+                    using var checkCommand = new MySqlCommand(checkColumnQuery, connection);
+                    checkCommand.Parameters.AddWithValue("@databaseName", _config.DatabaseName);
+                    checkCommand.Parameters.AddWithValue("@columnName", column);
+                    
+                    var result = await checkCommand.ExecuteScalarAsync();
+                    if (Convert.ToInt32(result) == 0)
+                    {
+                        // La columna no existe, crearla
+                        string addColumnQuery = $@"
+                            ALTER TABLE player_stats 
+                            ADD COLUMN {column} INT DEFAULT 0";
+                        
+                        using var command = new MySqlCommand(addColumnQuery, connection);
+                        await command.ExecuteNonQueryAsync();
+                        _logger?.LogInformation($"[Advanced Statistics] Added column {column}");
+                    }
+                }
+                
+                _logger?.LogInformation($"[Advanced Statistics] Added {stomachshotColumns.Length} stomachshot columns");
+            }
+            catch (Exception ex)
+            {
+                _logger?.LogError($"[Advanced Statistics] Failed to add stomachshot columns: {ex.Message}");
+                throw;
+            }
+        }
+
+        private async Task AddChestshotColumnsAsync(MySqlConnection connection)
+        {
+            try
+            {
+                _logger?.LogInformation("[Advanced Statistics] Adding chestshot columns...");
+                
+                // Columnas para chestshots por arma
+                string[] chestshotColumns = {
+                    "ak47_chestshots", "m4a4_chestshots", "m4a1s_chestshots", "aug_chestshots", "sg553_chestshots",
+                    "galilar_chestshots", "famas_chestshots", "awp_chestshots", "scout_chestshots", "scar20_chestshots",
+                    "g3sg1_chestshots", "ssg08_chestshots", "deagle_chestshots", "glock_chestshots", "usps_chestshots",
+                    "p250_chestshots", "p2000_chestshots", "fiveseven_chestshots", "tec9_chestshots", "cz75_chestshots",
+                    "dualies_chestshots", "revolver_chestshots", "nova_chestshots", "xm1014_chestshots", "sawedoff_chestshots",
+                    "mag7_chestshots", "mac10_chestshots", "mp9_chestshots", "mp7_chestshots", "ump45_chestshots",
+                    "p90_chestshots", "bizon_chestshots", "negev_chestshots", "m249_chestshots"
+                };
+
+                foreach (string column in chestshotColumns)
+                {
+                    // Verificar si la columna ya existe
+                    string checkColumnQuery = @"
+                        SELECT COUNT(*) 
+                        FROM INFORMATION_SCHEMA.COLUMNS 
+                        WHERE TABLE_SCHEMA = @databaseName 
+                        AND TABLE_NAME = 'player_stats' 
+                        AND COLUMN_NAME = @columnName";
+
+                    using var checkCommand = new MySqlCommand(checkColumnQuery, connection);
+                    checkCommand.Parameters.AddWithValue("@databaseName", _config.DatabaseName);
+                    checkCommand.Parameters.AddWithValue("@columnName", column);
+                    
+                    var result = await checkCommand.ExecuteScalarAsync();
+                    if (Convert.ToInt32(result) == 0)
+                    {
+                        // La columna no existe, crearla
+                        string addColumnQuery = $@"
+                            ALTER TABLE player_stats 
+                            ADD COLUMN {column} INT DEFAULT 0";
+                        
+                        using var command = new MySqlCommand(addColumnQuery, connection);
+                        await command.ExecuteNonQueryAsync();
+                        _logger?.LogInformation($"[Advanced Statistics] Added column {column}");
+                    }
+                }
+                
+                _logger?.LogInformation($"[Advanced Statistics] Added {chestshotColumns.Length} chestshot columns");
+            }
+            catch (Exception ex)
+            {
+                _logger?.LogError($"[Advanced Statistics] Failed to add chestshot columns: {ex.Message}");
+                throw;
+            }
+        }
+
+        private async Task AddHeadshotColumnsAsync(MySqlConnection connection)
+        {
+            try
+            {
+                _logger?.LogInformation("[Advanced Statistics] Adding headshot columns...");
+                
+                // Columnas para headshots por arma
+                string[] headshotColumns = {
+                    "ak47_headshots", "m4a4_headshots", "m4a1s_headshots", "aug_headshots", "sg553_headshots",
+                    "galilar_headshots", "famas_headshots", "awp_headshots", "scout_headshots", "scar20_headshots",
+                    "g3sg1_headshots", "ssg08_headshots", "deagle_headshots", "glock_headshots", "usps_headshots",
+                    "p250_headshots", "p2000_headshots", "fiveseven_headshots", "tec9_headshots", "cz75_headshots",
+                    "dualies_headshots", "revolver_headshots", "nova_headshots", "xm1014_headshots", "sawedoff_headshots",
+                    "mag7_headshots", "mac10_headshots", "mp9_headshots", "mp7_headshots", "ump45_headshots",
+                    "p90_headshots", "bizon_headshots", "negev_headshots", "m249_headshots"
+                };
+
+                foreach (string column in headshotColumns)
+                {
+                    // Verificar si la columna ya existe
+                    string checkColumnQuery = @"
+                        SELECT COUNT(*) 
+                        FROM INFORMATION_SCHEMA.COLUMNS 
+                        WHERE TABLE_SCHEMA = @databaseName 
+                        AND TABLE_NAME = 'player_stats' 
+                        AND COLUMN_NAME = @columnName";
+
+                    using var checkCommand = new MySqlCommand(checkColumnQuery, connection);
+                    checkCommand.Parameters.AddWithValue("@databaseName", _config.DatabaseName);
+                    checkCommand.Parameters.AddWithValue("@columnName", column);
+                    
+                    var result = await checkCommand.ExecuteScalarAsync();
+                    if (Convert.ToInt32(result) == 0)
+                    {
+                        // La columna no existe, crearla
+                        string addColumnQuery = $@"
+                            ALTER TABLE player_stats 
+                            ADD COLUMN {column} INT DEFAULT 0";
+                        
+                        using var command = new MySqlCommand(addColumnQuery, connection);
+                        await command.ExecuteNonQueryAsync();
+                        _logger?.LogInformation($"[Advanced Statistics] Added column {column}");
+                    }
+                }
+                
+                _logger?.LogInformation($"[Advanced Statistics] Added {headshotColumns.Length} headshot columns");
+            }
+            catch (Exception ex)
+            {
+                _logger?.LogError($"[Advanced Statistics] Failed to add headshot columns: {ex.Message}");
+                throw;
+            }
+        }
+
+        private async Task AddWeaponColumnsAsync(MySqlConnection connection)
+        {
+            try
+            {
+                _logger?.LogInformation("[Advanced Statistics] Adding weapon columns...");
+                
+                // Columnas para kills por arma
+                string[] killColumns = {
+                    "ak47_kills", "m4a4_kills", "m4a1s_kills", "aug_kills", "sg553_kills",
+                    "galilar_kills", "famas_kills", "awp_kills", "scout_kills", "scar20_kills",
+                    "g3sg1_kills", "ssg08_kills", "deagle_kills", "glock_kills", "usps_kills",
+                    "p250_kills", "p2000_kills", "fiveseven_kills", "tec9_kills", "cz75_kills",
+                    "dualies_kills", "revolver_kills", "nova_kills", "xm1014_kills", "sawedoff_kills",
+                    "mag7_kills", "mac10_kills", "mp9_kills", "mp7_kills", "ump45_kills",
+                    "p90_kills", "bizon_kills", "negev_kills", "m249_kills"
+                };
+
+                foreach (string column in killColumns)
+                {
+                    // Verificar si la columna ya existe
+                    string checkColumnQuery = @"
+                        SELECT COUNT(*) 
+                        FROM INFORMATION_SCHEMA.COLUMNS 
+                        WHERE TABLE_SCHEMA = @databaseName 
+                        AND TABLE_NAME = 'player_stats' 
+                        AND COLUMN_NAME = @columnName";
+
+                    using var checkCommand = new MySqlCommand(checkColumnQuery, connection);
+                    checkCommand.Parameters.AddWithValue("@databaseName", _config.DatabaseName);
+                    checkCommand.Parameters.AddWithValue("@columnName", column);
+                    
+                    var result = await checkCommand.ExecuteScalarAsync();
+                    if (Convert.ToInt32(result) == 0)
+                    {
+                        // La columna no existe, crearla
+                        string addColumnQuery = $@"
+                            ALTER TABLE player_stats 
+                            ADD COLUMN {column} INT DEFAULT 0";
+                        
+                        using var command = new MySqlCommand(addColumnQuery, connection);
+                        await command.ExecuteNonQueryAsync();
+                        _logger?.LogInformation($"[Advanced Statistics] Added column {column}");
+                    }
+                }
+                
+                _logger?.LogInformation($"[Advanced Statistics] Added {killColumns.Length} weapon columns");
+            }
+            catch (Exception ex)
+            {
+                _logger?.LogError($"[Advanced Statistics] Failed to add weapon columns: {ex.Message}");
+                throw;
+            }
+        }
+
+        private async Task AddDeathColumnsAsync(MySqlConnection connection)
+        {
+            try
+            {
+                _logger?.LogInformation("[Advanced Statistics] Adding death columns...");
+                
+                // Columnas para muertes por arma
+                string[] deathColumns = {
+                    "ak47_deaths", "m4a4_deaths", "m4a1s_deaths", "aug_deaths", "sg553_deaths",
+                    "galilar_deaths", "famas_deaths", "awp_deaths", "scout_deaths", "scar20_deaths",
+                    "g3sg1_deaths", "ssg08_deaths", "deagle_deaths", "glock_deaths", "usps_deaths",
+                    "p250_deaths", "p2000_deaths", "fiveseven_deaths", "tec9_deaths", "cz75_deaths",
+                    "dualies_deaths", "revolver_deaths", "nova_deaths", "xm1014_deaths", "sawedoff_deaths",
+                    "mag7_deaths", "mac10_deaths", "mp9_deaths", "mp7_deaths", "ump45_deaths",
+                    "p90_deaths", "bizon_deaths", "negev_deaths", "m249_deaths"
+                };
+
+                foreach (string column in deathColumns)
+                {
+                    // Verificar si la columna ya existe
+                    string checkColumnQuery = @"
+                        SELECT COUNT(*) 
+                        FROM INFORMATION_SCHEMA.COLUMNS 
+                        WHERE TABLE_SCHEMA = @databaseName 
+                        AND TABLE_NAME = 'player_stats' 
+                        AND COLUMN_NAME = @columnName";
+
+                    using var checkCommand = new MySqlCommand(checkColumnQuery, connection);
+                    checkCommand.Parameters.AddWithValue("@databaseName", _config.DatabaseName);
+                    checkCommand.Parameters.AddWithValue("@columnName", column);
+                    
+                    var result = await checkCommand.ExecuteScalarAsync();
+                    if (Convert.ToInt32(result) == 0)
+                    {
+                        // La columna no existe, crearla
+                        string addColumnQuery = $@"
+                            ALTER TABLE player_stats 
+                            ADD COLUMN {column} INT DEFAULT 0";
+                        
+                        using var command = new MySqlCommand(addColumnQuery, connection);
+                        await command.ExecuteNonQueryAsync();
+                        _logger?.LogInformation($"[Advanced Statistics] Added column {column}");
+                    }
+                }
+                
+                _logger?.LogInformation($"[Advanced Statistics] Added {deathColumns.Length} death columns");
+            }
+            catch (Exception ex)
+            {
+                _logger?.LogError($"[Advanced Statistics] Failed to add death columns: {ex.Message}");
+                throw;
+            }
+        }
+
+        private async Task AddAssistColumnsAsync(MySqlConnection connection)
+        {
+            try
+            {
+                _logger?.LogInformation("[Advanced Statistics] Adding assist columns...");
+                
+                // Columnas para asistencias por arma
+                string[] assistColumns = {
+                    "ak47_assists", "m4a4_assists", "m4a1s_assists", "aug_assists", "sg553_assists",
+                    "galilar_assists", "famas_assists", "awp_assists", "scout_assists", "scar20_assists",
+                    "g3sg1_assists", "ssg08_assists", "deagle_assists", "glock_assists", "usps_assists",
+                    "p250_assists", "p2000_assists", "fiveseven_assists", "tec9_assists", "cz75_assists",
+                    "dualies_assists", "revolver_assists", "nova_assists", "xm1014_assists", "sawedoff_assists",
+                    "mag7_assists", "mac10_assists", "mp9_assists", "mp7_assists", "ump45_assists",
+                    "p90_assists", "bizon_assists", "negev_assists", "m249_assists"
+                };
+
+                foreach (string column in assistColumns)
+                {
+                    string addColumnQuery = $@"
+                        ALTER TABLE player_stats 
+                        ADD COLUMN IF NOT EXISTS {column} INT DEFAULT 0";
+                    
+                    using var command = new MySqlCommand(addColumnQuery, connection);
+                    await command.ExecuteNonQueryAsync();
+                }
+                
+                _logger?.LogInformation($"[Advanced Statistics] Added {assistColumns.Length} assist columns");
+            }
+            catch (Exception ex)
+            {
+                _logger?.LogError($"[Advanced Statistics] Failed to add assist columns: {ex.Message}");
+                throw;
+            }
+        }
+                    "dualies_assists", "revolver_assists", "nova_assists", "xm1014_assists", "sawedoff_assists",
+                    "mag7_assists", "mac10_assists", "mp9_assists", "mp7_assists", "ump45_assists",
+                    "p90_assists", "bizon_assists", "negev_assists", "m249_assists"
+                };
+
+                foreach (string column in assistColumns)
+                {
+                    string addColumnQuery = $@"
+                        ALTER TABLE player_stats 
+                        ADD COLUMN IF NOT EXISTS {column} INT DEFAULT 0";
+                    
+                    using var command = new MySqlCommand(addColumnQuery, connection);
+                    await command.ExecuteNonQueryAsync();
+                }
+                
+                _logger?.LogInformation($"[Advanced Statistics] Added {assistColumns.Length} assist columns");
+            }
+            catch (Exception ex)
+            {
+                _logger?.LogError($"[Advanced Statistics] Failed to add assist columns: {ex.Message}");
+                throw;
+            }
+        }
+
+            {
+                _logger?.LogError($"[Advanced Statistics] Failed to add assist columns: {ex.Message}");
+                throw;
+            }
+        }
+
+        private async Task AddHeadshotColumnsAsync(MySqlConnection connection)
+        {
+            try
+            {
+                _logger?.LogInformation("[Advanced Statistics] Adding headshot columns...");
+                
+                // Columnas para headshots por arma
+                string[] headshotColumns = {
+                    "ak47_headshots", "m4a4_headshots", "m4a1s_headshots", "aug_headshots", "sg553_headshots",
+                    "galilar_headshots", "famas_headshots", "awp_headshots", "scout_headshots", "scar20_headshots",
+                    "g3sg1_headshots", "ssg08_headshots", "deagle_headshots", "glock_headshots", "usps_headshots",
+                    "p250_headshots", "p2000_headshots", "fiveseven_headshots", "tec9_headshots", "cz75_headshots",
+                    "dualies_headshots", "revolver_headshots", "nova_headshots", "xm1014_headshots", "sawedoff_headshots",
+                    "mag7_headshots", "mac10_headshots", "mp9_headshots", "mp7_headshots", "ump45_headshots",
+                    "p90_headshots", "bizon_headshots", "negev_headshots", "m249_headshots"
+                };
+
+                foreach (string column in headshotColumns)
+                {
+                    string addColumnQuery = $@"
+                        ALTER TABLE player_stats 
+                        ADD COLUMN IF NOT EXISTS {column} INT DEFAULT 0";
+                    
+                    using var command = new MySqlCommand(addColumnQuery, connection);
+                    await command.ExecuteNonQueryAsync();
+                }
+                
+                _logger?.LogInformation($"[Advanced Statistics] Added {headshotColumns.Length} headshot columns");
+            }
+            catch (Exception ex)
+            {
+                _logger?.LogError($"[Advanced Statistics] Failed to add headshot columns: {ex.Message}");
+                throw;
+            }
+        }
+
+        private async Task AddChestshotColumnsAsync(MySqlConnection connection)
+        {
+            try
+            {
+                _logger?.LogInformation("[Advanced Statistics] Adding chestshot columns...");
+                
+                // Columnas para chestshots por arma
+                string[] chestshotColumns = {
+                    "ak47_chestshots", "m4a4_chestshots", "m4a1s_chestshots", "aug_chestshots", "sg553_chestshots",
+                    "galilar_chestshots", "famas_chestshots", "awp_chestshots", "scout_chestshots", "scar20_chestshots",
+                    "g3sg1_chestshots", "ssg08_chestshots", "deagle_chestshots", "glock_chestshots", "usps_chestshots",
+                    "p250_chestshots", "p2000_chestshots", "fiveseven_chestshots", "tec9_chestshots", "cz75_chestshots",
+                    "dualies_chestshots", "revolver_chestshots", "nova_chestshots", "xm1014_chestshots", "sawedoff_chestshots",
+                    "mag7_chestshots", "mac10_chestshots", "mp9_chestshots", "mp7_chestshots", "ump45_chestshots",
+                    "p90_chestshots", "bizon_chestshots", "negev_chestshots", "m249_chestshots"
+                };
+
+                foreach (string column in chestshotColumns)
+                {
+                    string addColumnQuery = $@"
+                        ALTER TABLE player_stats 
+                        ADD COLUMN IF NOT EXISTS {column} INT DEFAULT 0";
+                    
+                    using var command = new MySqlCommand(addColumnQuery, connection);
+                    await command.ExecuteNonQueryAsync();
+                }
+                
+                _logger?.LogInformation($"[Advanced Statistics] Added {chestshotColumns.Length} chestshot columns");
+            }
+            catch (Exception ex)
+            {
+                _logger?.LogError($"[Advanced Statistics] Failed to add chestshot columns: {ex.Message}");
+                throw;
+            }
+        }
+
+        private async Task AddStomachshotColumnsAsync(MySqlConnection connection)
+        {
+            try
+            {
+                _logger?.LogInformation("[Advanced Statistics] Adding stomachshot columns...");
+                
+                // Columnas para stomachshots por arma
+                string[] stomachshotColumns = {
+                    "ak47_stomachshots", "m4a4_stomachshots", "m4a1s_stomachshots", "aug_stomachshots", "sg553_stomachshots",
+                    "galilar_stomachshots", "famas_stomachshots", "awp_stomachshots", "scout_stomachshots", "scar20_stomachshots",
+                    "g3sg1_stomachshots", "ssg08_stomachshots", "deagle_stomachshots", "glock_stomachshots", "usps_stomachshots",
+                    "p250_stomachshots", "p2000_stomachshots", "fiveseven_stomachshots", "tec9_stomachshots", "cz75_stomachshots",
+                    "dualies_stomachshots", "revolver_stomachshots", "nova_stomachshots", "xm1014_stomachshots", "sawedoff_stomachshots",
+                    "mag7_stomachshots", "mac10_stomachshots", "mp9_stomachshots", "mp7_stomachshots", "ump45_stomachshots",
+                    "p90_stomachshots", "bizon_stomachshots", "negev_stomachshots", "m249_stomachshots"
+                };
+
+                foreach (string column in stomachshotColumns)
+                {
+                    string addColumnQuery = $@"
+                        ALTER TABLE player_stats 
+                        ADD COLUMN IF NOT EXISTS {column} INT DEFAULT 0";
+                    
+                    using var command = new MySqlCommand(addColumnQuery, connection);
+                    await command.ExecuteNonQueryAsync();
+                }
+                
+                _logger?.LogInformation($"[Advanced Statistics] Added {stomachshotColumns.Length} stomachshot columns");
+            }
+            catch (Exception ex)
+            {
+                _logger?.LogError($"[Advanced Statistics] Failed to add stomachshot columns: {ex.Message}");
+                throw;
+            }
+        }
+
+        private async Task AddLegshotColumnsAsync(MySqlConnection connection)
+        {
+            try
+            {
+                _logger?.LogInformation("[Advanced Statistics] Adding legshot columns...");
+                
+                // Columnas para legshots por arma (piernas izquierdas y derechas)
+                string[] legshotColumns = {
+                    "ak47_leftlegshots", "m4a4_leftlegshots", "m4a1s_leftlegshots", "aug_leftlegshots", "sg553_leftlegshots",
+                    "galilar_leftlegshots", "famas_leftlegshots", "awp_leftlegshots", "scout_leftlegshots", "scar20_leftlegshots",
+                    "g3sg1_leftlegshots", "ssg08_leftlegshots", "deagle_leftlegshots", "glock_leftlegshots", "usps_leftlegshots",
+                    "p250_leftlegshots", "p2000_leftlegshots", "fiveseven_leftlegshots", "tec9_leftlegshots", "cz75_leftlegshots",
+                    "dualies_leftlegshots", "revolver_leftlegshots", "nova_leftlegshots", "xm1014_leftlegshots", "sawedoff_leftlegshots",
+                    "mag7_leftlegshots", "mac10_leftlegshots", "mp9_leftlegshots", "mp7_leftlegshots", "ump45_leftlegshots",
+                    "p90_leftlegshots", "bizon_leftlegshots", "negev_leftlegshots", "m249_leftlegshots",
+                    "ak47_rightlegshots", "m4a4_rightlegshots", "m4a1s_rightlegshots", "aug_rightlegshots", "sg553_rightlegshots",
+                    "galilar_rightlegshots", "famas_rightlegshots", "awp_rightlegshots", "scout_rightlegshots", "scar20_rightlegshots",
+                    "g3sg1_rightlegshots", "ssg08_rightlegshots", "deagle_rightlegshots", "glock_rightlegshots", "usps_rightlegshots",
+                    "p250_rightlegshots", "p2000_rightlegshots", "fiveseven_rightlegshots", "tec9_rightlegshots", "cz75_rightlegshots",
+                    "dualies_rightlegshots", "revolver_rightlegshots", "nova_rightlegshots", "xm1014_rightlegshots", "sawedoff_rightlegshots",
+                    "mag7_rightlegshots", "mac10_rightlegshots", "mp9_rightlegshots", "mp7_rightlegshots", "ump45_rightlegshots",
+                    "p90_rightlegshots", "bizon_rightlegshots", "negev_rightlegshots", "m249_rightlegshots"
+                };
+
+                foreach (string column in legshotColumns)
+                {
+                    // Verificar si la columna ya existe
+                    string checkColumnQuery = @"
+                        SELECT COUNT(*) 
+                        FROM INFORMATION_SCHEMA.COLUMNS 
+                        WHERE TABLE_SCHEMA = @databaseName 
+                        AND TABLE_NAME = 'player_stats' 
+                        AND COLUMN_NAME = @columnName";
+
+                    using var checkCommand = new MySqlCommand(checkColumnQuery, connection);
+                    checkCommand.Parameters.AddWithValue("@databaseName", _config.DatabaseName);
+                    checkCommand.Parameters.AddWithValue("@columnName", column);
+                    
+                    var result = await checkCommand.ExecuteScalarAsync();
+                    if (Convert.ToInt32(result) == 0)
+                    {
+                        // La columna no existe, crearla
+                        string addColumnQuery = $@"
+                            ALTER TABLE player_stats 
+                            ADD COLUMN {column} INT DEFAULT 0";
+                        
+                        using var command = new MySqlCommand(addColumnQuery, connection);
+                        await command.ExecuteNonQueryAsync();
+                        _logger?.LogInformation($"[Advanced Statistics] Added column {column}");
+                    }
+                }
+                
+                _logger?.LogInformation($"[Advanced Statistics] Added {legshotColumns.Length} legshot columns");
+            }
+            catch (Exception ex)
+            {
+                _logger?.LogError($"[Advanced Statistics] Failed to add legshot columns: {ex.Message}");
                 throw;
             }
         }
@@ -655,7 +973,7 @@ namespace AdvancedStatistics.Database
             }
             catch (Exception ex)
             {
-                _logger?.LogError($"Failed to get player stats: {ex.Message}");
+                _logger?.LogError($"[Advanced Statistics] Failed to get player stats: {ex.Message}");
                 return null;
             }
         }
@@ -784,286 +1102,286 @@ namespace AdvancedStatistics.Database
                         @mag7RightLegshots, @mac10RightLegshots, @mp9RightLegshots, @mp7RightLegshots, @ump45RightLegshots,
                         @p90RightLegshots, @bizonRightLegshots, @negevRightLegshots, @m249RightLegshots
                     ) ON DUPLICATE KEY UPDATE
-                        player_name = VALUES(player_name),
-                        total_kills = total_kills + VALUES(total_kills),
-                        total_deaths = total_deaths + VALUES(total_deaths),
-                        total_assists = total_assists + VALUES(total_assists),
-                        total_headshots = total_headshots + VALUES(total_headshots),
-                        total_rounds_played = total_rounds_played + VALUES(total_rounds_played),
-                        total_damage_done = total_damage_done + VALUES(total_damage_done),
-                        total_damage_taken = total_damage_taken + VALUES(total_damage_taken),
-                        ak47_kills = ak47_kills + VALUES(ak47_kills),
-                        m4a4_kills = m4a4_kills + VALUES(m4a4_kills),
-                        m4a1s_kills = m4a1s_kills + VALUES(m4a1s_kills),
-                        aug_kills = aug_kills + VALUES(aug_kills),
-                        sg553_kills = sg553_kills + VALUES(sg553_kills),
-                        galilar_kills = galilar_kills + VALUES(galilar_kills),
-                        famas_kills = famas_kills + VALUES(famas_kills),
-                        awp_kills = awp_kills + VALUES(awp_kills),
-                        scout_kills = scout_kills + VALUES(scout_kills),
-                        scar20_kills = scar20_kills + VALUES(scar20_kills),
-                        g3sg1_kills = g3sg1_kills + VALUES(g3sg1_kills),
-                        ssg08_kills = ssg08_kills + VALUES(ssg08_kills),
-                        deagle_kills = deagle_kills + VALUES(deagle_kills),
-                        glock_kills = glock_kills + VALUES(glock_kills),
-                        usps_kills = usps_kills + VALUES(usps_kills),
-                        p250_kills = p250_kills + VALUES(p250_kills),
-                        p2000_kills = p2000_kills + VALUES(p2000_kills),
-                        fiveseven_kills = fiveseven_kills + VALUES(fiveseven_kills),
-                        tec9_kills = tec9_kills + VALUES(tec9_kills),
-                        cz75_kills = cz75_kills + VALUES(cz75_kills),
-                        dualies_kills = dualies_kills + VALUES(dualies_kills),
-                        revolver_kills = revolver_kills + VALUES(revolver_kills),
-                        nova_kills = nova_kills + VALUES(nova_kills),
-                        xm1014_kills = xm1014_kills + VALUES(xm1014_kills),
-                        sawedoff_kills = sawedoff_kills + VALUES(sawedoff_kills),
-                        mag7_kills = mag7_kills + VALUES(mag7_kills),
-                        mac10_kills = mac10_kills + VALUES(mac10_kills),
-                        mp9_kills = mp9_kills + VALUES(mp9_kills),
-                        mp7_kills = mp7_kills + VALUES(mp7_kills),
-                        ump45_kills = ump45_kills + VALUES(ump45_kills),
-                        p90_kills = p90_kills + VALUES(p90_kills),
-                        bizon_kills = bizon_kills + VALUES(bizon_kills),
-                        negev_kills = negev_kills + VALUES(negev_kills),
-                        m249_kills = m249_kills + VALUES(m249_kills),
-                        ak47_deaths = ak47_deaths + VALUES(ak47_deaths),
-                        m4a4_deaths = m4a4_deaths + VALUES(m4a4_deaths),
-                        m4a1s_deaths = m4a1s_deaths + VALUES(m4a1s_deaths),
-                        aug_deaths = aug_deaths + VALUES(aug_deaths),
-                        sg553_deaths = sg553_deaths + VALUES(sg553_deaths),
-                        galilar_deaths = galilar_deaths + VALUES(galilar_deaths),
-                        famas_deaths = famas_deaths + VALUES(famas_deaths),
-                        awp_deaths = awp_deaths + VALUES(awp_deaths),
-                        scout_deaths = scout_deaths + VALUES(scout_deaths),
-                        scar20_deaths = scar20_deaths + VALUES(scar20_deaths),
-                        g3sg1_deaths = g3sg1_deaths + VALUES(g3sg1_deaths),
-                        ssg08_deaths = ssg08_deaths + VALUES(ssg08_deaths),
-                        deagle_deaths = deagle_deaths + VALUES(deagle_deaths),
-                        glock_deaths = glock_deaths + VALUES(glock_deaths),
-                        usps_deaths = usps_deaths + VALUES(usps_deaths),
-                        p250_deaths = p250_deaths + VALUES(p250_deaths),
-                        p2000_deaths = p2000_deaths + VALUES(p2000_deaths),
-                        fiveseven_deaths = fiveseven_deaths + VALUES(fiveseven_deaths),
-                        tec9_deaths = tec9_deaths + VALUES(tec9_deaths),
-                        cz75_deaths = cz75_deaths + VALUES(cz75_deaths),
-                        dualies_deaths = dualies_deaths + VALUES(dualies_deaths),
-                        revolver_deaths = revolver_deaths + VALUES(revolver_deaths),
-                        nova_deaths = nova_deaths + VALUES(nova_deaths),
-                        xm1014_deaths = xm1014_deaths + VALUES(xm1014_deaths),
-                        sawedoff_deaths = sawedoff_deaths + VALUES(sawedoff_deaths),
-                        mag7_deaths = mag7_deaths + VALUES(mag7_deaths),
-                        mac10_deaths = mac10_deaths + VALUES(mac10_deaths),
-                        mp9_deaths = mp9_deaths + VALUES(mp9_deaths),
-                        mp7_deaths = mp7_deaths + VALUES(mp7_deaths),
-                        ump45_deaths = ump45_deaths + VALUES(ump45_deaths),
-                        p90_deaths = p90_deaths + VALUES(p90_deaths),
-                        bizon_deaths = bizon_deaths + VALUES(bizon_deaths),
-                        negev_deaths = negev_deaths + VALUES(negev_deaths),
-                        m249_deaths = m249_deaths + VALUES(m249_deaths),
-                        ak47_assists = ak47_assists + VALUES(ak47_assists),
-                        m4a4_assists = m4a4_assists + VALUES(m4a4_assists),
-                        m4a1s_assists = m4a1s_assists + VALUES(m4a1s_assists),
-                        aug_assists = aug_assists + VALUES(aug_assists),
-                        sg553_assists = sg553_assists + VALUES(sg553_assists),
-                        galilar_assists = galilar_assists + VALUES(galilar_assists),
-                        famas_assists = famas_assists + VALUES(famas_assists),
-                        awp_assists = awp_assists + VALUES(awp_assists),
-                        scout_assists = scout_assists + VALUES(scout_assists),
-                        scar20_assists = scar20_assists + VALUES(scar20_assists),
-                        g3sg1_assists = g3sg1_assists + VALUES(g3sg1_assists),
-                        ssg08_assists = ssg08_assists + VALUES(ssg08_assists),
-                        deagle_assists = deagle_assists + VALUES(deagle_assists),
-                        glock_assists = glock_assists + VALUES(glock_assists),
-                        usps_assists = usps_assists + VALUES(usps_assists),
-                        p250_assists = p250_assists + VALUES(p250_assists),
-                        p2000_assists = p2000_assists + VALUES(p2000_assists),
-                        fiveseven_assists = fiveseven_assists + VALUES(fiveseven_assists),
-                        tec9_assists = tec9_assists + VALUES(tec9_assists),
-                        cz75_assists = cz75_assists + VALUES(cz75_assists),
-                        dualies_assists = dualies_assists + VALUES(dualies_assists),
-                        revolver_assists = revolver_assists + VALUES(revolver_assists),
-                        nova_assists = nova_assists + VALUES(nova_assists),
-                        xm1014_assists = xm1014_assists + VALUES(xm1014_assists),
-                        sawedoff_assists = sawedoff_assists + VALUES(sawedoff_assists),
-                        mag7_assists = mag7_assists + VALUES(mag7_assists),
-                        mac10_assists = mac10_assists + VALUES(mac10_assists),
-                        mp9_assists = mp9_assists + VALUES(mp9_assists),
-                        mp7_assists = mp7_assists + VALUES(mp7_assists),
-                        ump45_assists = ump45_assists + VALUES(ump45_assists),
-                        p90_assists = p90_assists + VALUES(p90_assists),
-                        bizon_assists = bizon_assists + VALUES(bizon_assists),
-                        negev_assists = negev_assists + VALUES(negev_assists),
-                        m249_assists = m249_assists + VALUES(m249_assists),
-                        ak47_headshots = ak47_headshots + VALUES(ak47_headshots),
-                        m4a4_headshots = m4a4_headshots + VALUES(m4a4_headshots),
-                        m4a1s_headshots = m4a1s_headshots + VALUES(m4a1s_headshots),
-                        aug_headshots = aug_headshots + VALUES(aug_headshots),
-                        sg553_headshots = sg553_headshots + VALUES(sg553_headshots),
-                        galilar_headshots = galilar_headshots + VALUES(galilar_headshots),
-                        famas_headshots = famas_headshots + VALUES(famas_headshots),
-                        awp_headshots = awp_headshots + VALUES(awp_headshots),
-                        scout_headshots = scout_headshots + VALUES(scout_headshots),
-                        scar20_headshots = scar20_headshots + VALUES(scar20_headshots),
-                        g3sg1_headshots = g3sg1_headshots + VALUES(g3sg1_headshots),
-                        ssg08_headshots = ssg08_headshots + VALUES(ssg08_headshots),
-                        deagle_headshots = deagle_headshots + VALUES(deagle_headshots),
-                        glock_headshots = glock_headshots + VALUES(glock_headshots),
-                        usps_headshots = usps_headshots + VALUES(usps_headshots),
-                        p250_headshots = p250_headshots + VALUES(p250_headshots),
-                        p2000_headshots = p2000_headshots + VALUES(p2000_headshots),
-                        fiveseven_headshots = fiveseven_headshots + VALUES(fiveseven_headshots),
-                        tec9_headshots = tec9_headshots + VALUES(tec9_headshots),
-                        cz75_headshots = cz75_headshots + VALUES(cz75_headshots),
-                        dualies_headshots = dualies_headshots + VALUES(dualies_headshots),
-                        revolver_headshots = revolver_headshots + VALUES(revolver_headshots),
-                        nova_headshots = nova_headshots + VALUES(nova_headshots),
-                        xm1014_headshots = xm1014_headshots + VALUES(xm1014_headshots),
-                        sawedoff_headshots = sawedoff_headshots + VALUES(sawedoff_headshots),
-                        mag7_headshots = mag7_headshots + VALUES(mag7_headshots),
-                        mac10_headshots = mac10_headshots + VALUES(mac10_headshots),
-                        mp9_headshots = mp9_headshots + VALUES(mp9_headshots),
-                        mp7_headshots = mp7_headshots + VALUES(mp7_headshots),
-                        ump45_headshots = ump45_headshots + VALUES(ump45_headshots),
-                        p90_headshots = p90_headshots + VALUES(p90_headshots),
-                        bizon_headshots = bizon_headshots + VALUES(bizon_headshots),
-                        negev_headshots = negev_headshots + VALUES(negev_headshots),
-                        m249_headshots = m249_headshots + VALUES(m249_headshots),
-                        ak47_chestshots = ak47_chestshots + VALUES(ak47_chestshots),
-                        m4a4_chestshots = m4a4_chestshots + VALUES(m4a4_chestshots),
-                        m4a1s_chestshots = m4a1s_chestshots + VALUES(m4a1s_chestshots),
-                        aug_chestshots = aug_chestshots + VALUES(aug_chestshots),
-                        sg553_chestshots = sg553_chestshots + VALUES(sg553_chestshots),
-                        galilar_chestshots = galilar_chestshots + VALUES(galilar_chestshots),
-                        famas_chestshots = famas_chestshots + VALUES(famas_chestshots),
-                        awp_chestshots = awp_chestshots + VALUES(awp_chestshots),
-                        scout_chestshots = scout_chestshots + VALUES(scout_chestshots),
-                        scar20_chestshots = scar20_chestshots + VALUES(scar20_chestshots),
-                        g3sg1_chestshots = g3sg1_chestshots + VALUES(g3sg1_chestshots),
-                        ssg08_chestshots = ssg08_chestshots + VALUES(ssg08_chestshots),
-                        deagle_chestshots = deagle_chestshots + VALUES(deagle_chestshots),
-                        glock_chestshots = glock_chestshots + VALUES(glock_chestshots),
-                        usps_chestshots = usps_chestshots + VALUES(usps_chestshots),
-                        p250_chestshots = p250_chestshots + VALUES(p250_chestshots),
-                        p2000_chestshots = p2000_chestshots + VALUES(p2000_chestshots),
-                        fiveseven_chestshots = fiveseven_chestshots + VALUES(fiveseven_chestshots),
-                        tec9_chestshots = tec9_chestshots + VALUES(tec9_chestshots),
-                        cz75_chestshots = cz75_chestshots + VALUES(cz75_chestshots),
-                        dualies_chestshots = dualies_chestshots + VALUES(dualies_chestshots),
-                        revolver_chestshots = revolver_chestshots + VALUES(revolver_chestshots),
-                        nova_chestshots = nova_chestshots + VALUES(nova_chestshots),
-                        xm1014_chestshots = xm1014_chestshots + VALUES(xm1014_chestshots),
-                        sawedoff_chestshots = sawedoff_chestshots + VALUES(sawedoff_chestshots),
-                        mag7_chestshots = mag7_chestshots + VALUES(mag7_chestshots),
-                        mac10_chestshots = mac10_chestshots + VALUES(mac10_chestshots),
-                        mp9_chestshots = mp9_chestshots + VALUES(mp9_chestshots),
-                        mp7_chestshots = mp7_chestshots + VALUES(mp7_chestshots),
-                        ump45_chestshots = ump45_chestshots + VALUES(ump45_chestshots),
-                        p90_chestshots = p90_chestshots + VALUES(p90_chestshots),
-                        bizon_chestshots = bizon_chestshots + VALUES(bizon_chestshots),
-                        negev_chestshots = negev_chestshots + VALUES(negev_chestshots),
-                        m249_chestshots = m249_chestshots + VALUES(m249_chestshots),
-                        ak47_stomachshots = ak47_stomachshots + VALUES(ak47_stomachshots),
-                        m4a4_stomachshots = m4a4_stomachshots + VALUES(m4a4_stomachshots),
-                        m4a1s_stomachshots = m4a1s_stomachshots + VALUES(m4a1s_stomachshots),
-                        aug_stomachshots = aug_stomachshots + VALUES(aug_stomachshots),
-                        sg553_stomachshots = sg553_stomachshots + VALUES(sg553_stomachshots),
-                        galilar_stomachshots = galilar_stomachshots + VALUES(galilar_stomachshots),
-                        famas_stomachshots = famas_stomachshots + VALUES(famas_stomachshots),
-                        awp_stomachshots = awp_stomachshots + VALUES(awp_stomachshots),
-                        scout_stomachshots = scout_stomachshots + VALUES(scout_stomachshots),
-                        scar20_stomachshots = scar20_stomachshots + VALUES(scar20_stomachshots),
-                        g3sg1_stomachshots = g3sg1_stomachshots + VALUES(g3sg1_stomachshots),
-                        ssg08_stomachshots = ssg08_stomachshots + VALUES(ssg08_stomachshots),
-                        deagle_stomachshots = deagle_stomachshots + VALUES(deagle_stomachshots),
-                        glock_stomachshots = glock_stomachshots + VALUES(glock_stomachshots),
-                        usps_stomachshots = usps_stomachshots + VALUES(usps_stomachshots),
-                        p250_stomachshots = p250_stomachshots + VALUES(p250_stomachshots),
-                        p2000_stomachshots = p2000_stomachshots + VALUES(p2000_stomachshots),
-                        fiveseven_stomachshots = fiveseven_stomachshots + VALUES(fiveseven_stomachshots),
-                        tec9_stomachshots = tec9_stomachshots + VALUES(tec9_stomachshots),
-                        cz75_stomachshots = cz75_stomachshots + VALUES(cz75_stomachshots),
-                        dualies_stomachshots = dualies_stomachshots + VALUES(dualies_stomachshots),
-                        revolver_stomachshots = revolver_stomachshots + VALUES(revolver_stomachshots),
-                        nova_stomachshots = nova_stomachshots + VALUES(nova_stomachshots),
-                        xm1014_stomachshots = xm1014_stomachshots + VALUES(xm1014_stomachshots),
-                        sawedoff_stomachshots = sawedoff_stomachshots + VALUES(sawedoff_stomachshots),
-                        mag7_stomachshots = mag7_stomachshots + VALUES(mag7_stomachshots),
-                        mac10_stomachshots = mac10_stomachshots + VALUES(mac10_stomachshots),
-                        mp9_stomachshots = mp9_stomachshots + VALUES(mp9_stomachshots),
-                        mp7_stomachshots = mp7_stomachshots + VALUES(mp7_stomachshots),
-                        ump45_stomachshots = ump45_stomachshots + VALUES(ump45_stomachshots),
-                        p90_stomachshots = p90_stomachshots + VALUES(p90_stomachshots),
-                        bizon_stomachshots = bizon_stomachshots + VALUES(bizon_stomachshots),
-                        negev_stomachshots = negev_stomachshots + VALUES(negev_stomachshots),
-                        m249_stomachshots = m249_stomachshots + VALUES(m249_stomachshots),
-                        ak47_leftlegshots = ak47_leftlegshots + VALUES(ak47_leftlegshots),
-                        m4a4_leftlegshots = m4a4_leftlegshots + VALUES(m4a4_leftlegshots),
-                        m4a1s_leftlegshots = m4a1s_leftlegshots + VALUES(m4a1s_leftlegshots),
-                        aug_leftlegshots = aug_leftlegshots + VALUES(aug_leftlegshots),
-                        sg553_leftlegshots = sg553_leftlegshots + VALUES(sg553_leftlegshots),
-                        galilar_leftlegshots = galilar_leftlegshots + VALUES(galilar_leftlegshots),
-                        famas_leftlegshots = famas_leftlegshots + VALUES(famas_leftlegshots),
-                        awp_leftlegshots = awp_leftlegshots + VALUES(awp_leftlegshots),
-                        scout_leftlegshots = scout_leftlegshots + VALUES(scout_leftlegshots),
-                        scar20_leftlegshots = scar20_leftlegshots + VALUES(scar20_leftlegshots),
-                        g3sg1_leftlegshots = g3sg1_leftlegshots + VALUES(g3sg1_leftlegshots),
-                        ssg08_leftlegshots = ssg08_leftlegshots + VALUES(ssg08_leftlegshots),
-                        deagle_leftlegshots = deagle_leftlegshots + VALUES(deagle_leftlegshots),
-                        glock_leftlegshots = glock_leftlegshots + VALUES(glock_leftlegshots),
-                        usps_leftlegshots = usps_leftlegshots + VALUES(usps_leftlegshots),
-                        p250_leftlegshots = p250_leftlegshots + VALUES(p250_leftlegshots),
-                        p2000_leftlegshots = p2000_leftlegshots + VALUES(p2000_leftlegshots),
-                        fiveseven_leftlegshots = fiveseven_leftlegshots + VALUES(fiveseven_leftlegshots),
-                        tec9_leftlegshots = tec9_leftlegshots + VALUES(tec9_leftlegshots),
-                        cz75_leftlegshots = cz75_leftlegshots + VALUES(cz75_leftlegshots),
-                        dualies_leftlegshots = dualies_leftlegshots + VALUES(dualies_leftlegshots),
-                        revolver_leftlegshots = revolver_leftlegshots + VALUES(revolver_leftlegshots),
-                        nova_leftlegshots = nova_leftlegshots + VALUES(nova_leftlegshots),
-                        xm1014_leftlegshots = xm1014_leftlegshots + VALUES(xm1014_leftlegshots),
-                        sawedoff_leftlegshots = sawedoff_leftlegshots + VALUES(sawedoff_leftlegshots),
-                        mag7_leftlegshots = mag7_leftlegshots + VALUES(mag7_leftlegshots),
-                        mac10_leftlegshots = mac10_leftlegshots + VALUES(mac10_leftlegshots),
-                        mp9_leftlegshots = mp9_leftlegshots + VALUES(mp9_leftlegshots),
-                        mp7_leftlegshots = mp7_leftlegshots + VALUES(mp7_leftlegshots),
-                        ump45_leftlegshots = ump45_leftlegshots + VALUES(ump45_leftlegshots),
-                        p90_leftlegshots = p90_leftlegshots + VALUES(p90_leftlegshots),
-                        bizon_leftlegshots = bizon_leftlegshots + VALUES(bizon_leftlegshots),
-                        negev_leftlegshots = negev_leftlegshots + VALUES(negev_leftlegshots),
-                        m249_leftlegshots = m249_leftlegshots + VALUES(m249_leftlegshots),
-                        ak47_rightlegshots = ak47_rightlegshots + VALUES(ak47_rightlegshots),
-                        m4a4_rightlegshots = m4a4_rightlegshots + VALUES(m4a4_rightlegshots),
-                        m4a1s_rightlegshots = m4a1s_rightlegshots + VALUES(m4a1s_rightlegshots),
-                        aug_rightlegshots = aug_rightlegshots + VALUES(aug_rightlegshots),
-                        sg553_rightlegshots = sg553_rightlegshots + VALUES(sg553_rightlegshots),
-                        galilar_rightlegshots = galilar_rightlegshots + VALUES(galilar_rightlegshots),
-                        famas_rightlegshots = famas_rightlegshots + VALUES(famas_rightlegshots),
-                        awp_rightlegshots = awp_rightlegshots + VALUES(awp_rightlegshots),
-                        scout_rightlegshots = scout_rightlegshots + VALUES(scout_rightlegshots),
-                        scar20_rightlegshots = scar20_rightlegshots + VALUES(scar20_rightlegshots),
-                        g3sg1_rightlegshots = g3sg1_rightlegshots + VALUES(g3sg1_rightlegshots),
-                        ssg08_rightlegshots = ssg08_rightlegshots + VALUES(ssg08_rightlegshots),
-                        deagle_rightlegshots = deagle_rightlegshots + VALUES(deagle_rightlegshots),
-                        glock_rightlegshots = glock_rightlegshots + VALUES(glock_rightlegshots),
-                        usps_rightlegshots = usps_rightlegshots + VALUES(usps_rightlegshots),
-                        p250_rightlegshots = p250_rightlegshots + VALUES(p250_rightlegshots),
-                        p2000_rightlegshots = p2000_rightlegshots + VALUES(p2000_rightlegshots),
-                        fiveseven_rightlegshots = fiveseven_rightlegshots + VALUES(fiveseven_rightlegshots),
-                        tec9_rightlegshots = tec9_rightlegshots + VALUES(tec9_rightlegshots),
-                        cz75_rightlegshots = cz75_rightlegshots + VALUES(cz75_rightlegshots),
-                        dualies_rightlegshots = dualies_rightlegshots + VALUES(dualies_rightlegshots),
-                        revolver_rightlegshots = revolver_rightlegshots + VALUES(revolver_rightlegshots),
-                        nova_rightlegshots = nova_rightlegshots + VALUES(nova_rightlegshots),
-                        xm1014_rightlegshots = xm1014_rightlegshots + VALUES(xm1014_rightlegshots),
-                        sawedoff_rightlegshots = sawedoff_rightlegshots + VALUES(sawedoff_rightlegshots),
-                        mag7_rightlegshots = mag7_rightlegshots + VALUES(mag7_rightlegshots),
-                        mac10_rightlegshots = mac10_rightlegshots + VALUES(mac10_rightlegshots),
-                        mp9_rightlegshots = mp9_rightlegshots + VALUES(mp9_rightlegshots),
-                        mp7_rightlegshots = mp7_rightlegshots + VALUES(mp7_rightlegshots),
-                        ump45_rightlegshots = ump45_rightlegshots + VALUES(ump45_rightlegshots),
-                        p90_rightlegshots = p90_rightlegshots + VALUES(p90_rightlegshots),
-                        bizon_rightlegshots = bizon_rightlegshots + VALUES(bizon_rightlegshots),
-                        negev_rightlegshots = negev_rightlegshots + VALUES(negev_rightlegshots),
-                        m249_rightlegshots = m249_rightlegshots + VALUES(m249_rightlegshots),
+                        player_name = @playerName,
+                        total_kills = total_kills + @totalKills,
+                        total_deaths = total_deaths + @totalDeaths,
+                        total_assists = total_assists + @totalAssists,
+                        total_headshots = total_headshots + @totalHeadshots,
+                        total_rounds_played = total_rounds_played + @totalRoundsPlayed,
+                        total_damage_done = total_damage_done + @totalDamageDone,
+                        total_damage_taken = total_damage_taken + @totalDamageTaken,
+                        ak47_kills = ak47_kills + @ak47Kills,
+                        m4a4_kills = m4a4_kills + @m4a4Kills,
+                        m4a1s_kills = m4a1s_kills + @m4a1sKills,
+                        aug_kills = aug_kills + @augKills,
+                        sg553_kills = sg553_kills + @sg553Kills,
+                        galilar_kills = galilar_kills + @galilarKills,
+                        famas_kills = famas_kills + @famasKills,
+                        awp_kills = awp_kills + @awpKills,
+                        scout_kills = scout_kills + @scoutKills,
+                        scar20_kills = scar20_kills + @scar20Kills,
+                        g3sg1_kills = g3sg1_kills + @g3sg1Kills,
+                        ssg08_kills = ssg08_kills + @ssg08Kills,
+                        deagle_kills = deagle_kills + @deagleKills,
+                        glock_kills = glock_kills + @glockKills,
+                        usps_kills = usps_kills + @uspsKills,
+                        p250_kills = p250_kills + @p250Kills,
+                        p2000_kills = p2000_kills + @p2000Kills,
+                        fiveseven_kills = fiveseven_kills + @fivesevenKills,
+                        tec9_kills = tec9_kills + @tec9Kills,
+                        cz75_kills = cz75_kills + @cz75Kills,
+                        dualies_kills = dualies_kills + @dualiesKills,
+                        revolver_kills = revolver_kills + @revolverKills,
+                        nova_kills = nova_kills + @novaKills,
+                        xm1014_kills = xm1014_kills + @xm1014Kills,
+                        sawedoff_kills = sawedoff_kills + @sawedoffKills,
+                        mag7_kills = mag7_kills + @mag7Kills,
+                        mac10_kills = mac10_kills + @mac10Kills,
+                        mp9_kills = mp9_kills + @mp9Kills,
+                        mp7_kills = mp7_kills + @mp7Kills,
+                        ump45_kills = ump45_kills + @ump45Kills,
+                        p90_kills = p90_kills + @p90Kills,
+                        bizon_kills = bizon_kills + @bizonKills,
+                        negev_kills = negev_kills + @negevKills,
+                        m249_kills = m249_kills + @m249Kills,
+                        ak47_deaths = ak47_deaths + @ak47Deaths,
+                        m4a4_deaths = m4a4_deaths + @m4a4Deaths,
+                        m4a1s_deaths = m4a1s_deaths + @m4a1sDeaths,
+                        aug_deaths = aug_deaths + @augDeaths,
+                        sg553_deaths = sg553_deaths + @sg553Deaths,
+                        galilar_deaths = galilar_deaths + @galilarDeaths,
+                        famas_deaths = famas_deaths + @famasDeaths,
+                        awp_deaths = awp_deaths + @awpDeaths,
+                        scout_deaths = scout_deaths + @scoutDeaths,
+                        scar20_deaths = scar20_deaths + @scar20Deaths,
+                        g3sg1_deaths = g3sg1_deaths + @g3sg1Deaths,
+                        ssg08_deaths = ssg08_deaths + @ssg08Deaths,
+                        deagle_deaths = deagle_deaths + @deagleDeaths,
+                        glock_deaths = glock_deaths + @glockDeaths,
+                        usps_deaths = usps_deaths + @uspsDeaths,
+                        p250_deaths = p250_deaths + @p250Deaths,
+                        p2000_deaths = p2000_deaths + @p2000Deaths,
+                        fiveseven_deaths = fiveseven_deaths + @fivesevenDeaths,
+                        tec9_deaths = tec9_deaths + @tec9Deaths,
+                        cz75_deaths = cz75_deaths + @cz75Deaths,
+                        dualies_deaths = dualies_deaths + @dualiesDeaths,
+                        revolver_deaths = revolver_deaths + @revolverDeaths,
+                        nova_deaths = nova_deaths + @novaDeaths,
+                        xm1014_deaths = xm1014_deaths + @xm1014Deaths,
+                        sawedoff_deaths = sawedoff_deaths + @sawedoffDeaths,
+                        mag7_deaths = mag7_deaths + @mag7Deaths,
+                        mac10_deaths = mac10_deaths + @mac10Deaths,
+                        mp9_deaths = mp9_deaths + @mp9Deaths,
+                        mp7_deaths = mp7_deaths + @mp7Deaths,
+                        ump45_deaths = ump45_deaths + @ump45Deaths,
+                        p90_deaths = p90_deaths + @p90Deaths,
+                        bizon_deaths = bizon_deaths + @bizonDeaths,
+                        negev_deaths = negev_deaths + @negevDeaths,
+                        m249_deaths = m249_deaths + @m249Deaths,
+                        ak47_assists = ak47_assists + @ak47Assists,
+                        m4a4_assists = m4a4_assists + @m4a4Assists,
+                        m4a1s_assists = m4a1s_assists + @m4a1sAssists,
+                        aug_assists = aug_assists + @augAssists,
+                        sg553_assists = sg553_assists + @sg553Assists,
+                        galilar_assists = galilar_assists + @galilarAssists,
+                        famas_assists = famas_assists + @famasAssists,
+                        awp_assists = awp_assists + @awpAssists,
+                        scout_assists = scout_assists + @scoutAssists,
+                        scar20_assists = scar20_assists + @scar20Assists,
+                        g3sg1_assists = g3sg1_assists + @g3sg1Assists,
+                        ssg08_assists = ssg08_assists + @ssg08Assists,
+                        deagle_assists = deagle_assists + @deagleAssists,
+                        glock_assists = glock_assists + @glockAssists,
+                        usps_assists = usps_assists + @uspsAssists,
+                        p250_assists = p250_assists + @p250Assists,
+                        p2000_assists = p2000_assists + @p2000Assists,
+                        fiveseven_assists = fiveseven_assists + @fivesevenAssists,
+                        tec9_assists = tec9_assists + @tec9Assists,
+                        cz75_assists = cz75_assists + @cz75Assists,
+                        dualies_assists = dualies_assists + @dualiesAssists,
+                        revolver_assists = revolver_assists + @revolverAssists,
+                        nova_assists = nova_assists + @novaAssists,
+                        xm1014_assists = xm1014_assists + @xm1014Assists,
+                        sawedoff_assists = sawedoff_assists + @sawedoffAssists,
+                        mag7_assists = mag7_assists + @mag7Assists,
+                        mac10_assists = mac10_assists + @mac10Assists,
+                        mp9_assists = mp9_assists + @mp9Assists,
+                        mp7_assists = mp7_assists + @mp7Assists,
+                        ump45_assists = ump45_assists + @ump45Assists,
+                        p90_assists = p90_assists + @p90Assists,
+                        bizon_assists = bizon_assists + @bizonAssists,
+                        negev_assists = negev_assists + @negevAssists,
+                        m249_assists = m249_assists + @m249Assists,
+                        ak47_headshots = ak47_headshots + @ak47Headshots,
+                        m4a4_headshots = m4a4_headshots + @m4a4Headshots,
+                        m4a1s_headshots = m4a1s_headshots + @m4a1sHeadshots,
+                        aug_headshots = aug_headshots + @augHeadshots,
+                        sg553_headshots = sg553_headshots + @sg553Headshots,
+                        galilar_headshots = galilar_headshots + @galilarHeadshots,
+                        famas_headshots = famas_headshots + @famasHeadshots,
+                        awp_headshots = awp_headshots + @awpHeadshots,
+                        scout_headshots = scout_headshots + @scoutHeadshots,
+                        scar20_headshots = scar20_headshots + @scar20Headshots,
+                        g3sg1_headshots = g3sg1_headshots + @g3sg1Headshots,
+                        ssg08_headshots = ssg08_headshots + @ssg08Headshots,
+                        deagle_headshots = deagle_headshots + @deagleHeadshots,
+                        glock_headshots = glock_headshots + @glockHeadshots,
+                        usps_headshots = usps_headshots + @uspsHeadshots,
+                        p250_headshots = p250_headshots + @p250Headshots,
+                        p2000_headshots = p2000_headshots + @p2000Headshots,
+                        fiveseven_headshots = fiveseven_headshots + @fivesevenHeadshots,
+                        tec9_headshots = tec9_headshots + @tec9Headshots,
+                        cz75_headshots = cz75_headshots + @cz75Headshots,
+                        dualies_headshots = dualies_headshots + @dualiesHeadshots,
+                        revolver_headshots = revolver_headshots + @revolverHeadshots,
+                        nova_headshots = nova_headshots + @novaHeadshots,
+                        xm1014_headshots = xm1014_headshots + @xm1014Headshots,
+                        sawedoff_headshots = sawedoff_headshots + @sawedoffHeadshots,
+                        mag7_headshots = mag7_headshots + @mag7Headshots,
+                        mac10_headshots = mac10_headshots + @mac10Headshots,
+                        mp9_headshots = mp9_headshots + @mp9Headshots,
+                        mp7_headshots = mp7_headshots + @mp7Headshots,
+                        ump45_headshots = ump45_headshots + @ump45Headshots,
+                        p90_headshots = p90_headshots + @p90Headshots,
+                        bizon_headshots = bizon_headshots + @bizonHeadshots,
+                        negev_headshots = negev_headshots + @negevHeadshots,
+                        m249_headshots = m249_headshots + @m249Headshots,
+                        ak47_chestshots = ak47_chestshots + @ak47Chestshots,
+                        m4a4_chestshots = m4a4_chestshots + @m4a4Chestshots,
+                        m4a1s_chestshots = m4a1s_chestshots + @m4a1sChestshots,
+                        aug_chestshots = aug_chestshots + @augChestshots,
+                        sg553_chestshots = sg553_chestshots + @sg553Chestshots,
+                        galilar_chestshots = galilar_chestshots + @galilarChestshots,
+                        famas_chestshots = famas_chestshots + @famasChestshots,
+                        awp_chestshots = awp_chestshots + @awpChestshots,
+                        scout_chestshots = scout_chestshots + @scoutChestshots,
+                        scar20_chestshots = scar20_chestshots + @scar20Chestshots,
+                        g3sg1_chestshots = g3sg1_chestshots + @g3sg1Chestshots,
+                        ssg08_chestshots = ssg08_chestshots + @ssg08Chestshots,
+                        deagle_chestshots = deagle_chestshots + @deagleChestshots,
+                        glock_chestshots = glock_chestshots + @glockChestshots,
+                        usps_chestshots = usps_chestshots + @uspsChestshots,
+                        p250_chestshots = p250_chestshots + @p250Chestshots,
+                        p2000_chestshots = p2000_chestshots + @p2000Chestshots,
+                        fiveseven_chestshots = fiveseven_chestshots + @fivesevenChestshots,
+                        tec9_chestshots = tec9_chestshots + @tec9Chestshots,
+                        cz75_chestshots = cz75_chestshots + @cz75Chestshots,
+                        dualies_chestshots = dualies_chestshots + @dualiesChestshots,
+                        revolver_chestshots = revolver_chestshots + @revolverChestshots,
+                        nova_chestshots = nova_chestshots + @novaChestshots,
+                        xm1014_chestshots = xm1014_chestshots + @xm1014Chestshots,
+                        sawedoff_chestshots = sawedoff_chestshots + @sawedoffChestshots,
+                        mag7_chestshots = mag7_chestshots + @mag7Chestshots,
+                        mac10_chestshots = mac10_chestshots + @mac10Chestshots,
+                        mp9_chestshots = mp9_chestshots + @mp9Chestshots,
+                        mp7_chestshots = mp7_chestshots + @mp7Chestshots,
+                        ump45_chestshots = ump45_chestshots + @ump45Chestshots,
+                        p90_chestshots = p90_chestshots + @p90Chestshots,
+                        bizon_chestshots = bizon_chestshots + @bizonChestshots,
+                        negev_chestshots = negev_chestshots + @negevChestshots,
+                        m249_chestshots = m249_chestshots + @m249Chestshots,
+                        ak47_stomachshots = ak47_stomachshots + @ak47Stomachshots,
+                        m4a4_stomachshots = m4a4_stomachshots + @m4a4Stomachshots,
+                        m4a1s_stomachshots = m4a1s_stomachshots + @m4a1sStomachshots,
+                        aug_stomachshots = aug_stomachshots + @augStomachshots,
+                        sg553_stomachshots = sg553_stomachshots + @sg553Stomachshots,
+                        galilar_stomachshots = galilar_stomachshots + @galilarStomachshots,
+                        famas_stomachshots = famas_stomachshots + @famasStomachshots,
+                        awp_stomachshots = awp_stomachshots + @awpStomachshots,
+                        scout_stomachshots = scout_stomachshots + @scoutStomachshots,
+                        scar20_stomachshots = scar20_stomachshots + @scar20Stomachshots,
+                        g3sg1_stomachshots = g3sg1_stomachshots + @g3sg1Stomachshots,
+                        ssg08_stomachshots = ssg08_stomachshots + @ssg08Stomachshots,
+                        deagle_stomachshots = deagle_stomachshots + @deagleStomachshots,
+                        glock_stomachshots = glock_stomachshots + @glockStomachshots,
+                        usps_stomachshots = usps_stomachshots + @uspsStomachshots,
+                        p250_stomachshots = p250_stomachshots + @p250Stomachshots,
+                        p2000_stomachshots = p2000_stomachshots + @p2000Stomachshots,
+                        fiveseven_stomachshots = fiveseven_stomachshots + @fivesevenStomachshots,
+                        tec9_stomachshots = tec9_stomachshots + @tec9Stomachshots,
+                        cz75_stomachshots = cz75_stomachshots + @cz75Stomachshots,
+                        dualies_stomachshots = dualies_stomachshots + @dualiesStomachshots,
+                        revolver_stomachshots = revolver_stomachshots + @revolverStomachshots,
+                        nova_stomachshots = nova_stomachshots + @novaStomachshots,
+                        xm1014_stomachshots = xm1014_stomachshots + @xm1014Stomachshots,
+                        sawedoff_stomachshots = sawedoff_stomachshots + @sawedoffStomachshots,
+                        mag7_stomachshots = mag7_stomachshots + @mag7Stomachshots,
+                        mac10_stomachshots = mac10_stomachshots + @mac10Stomachshots,
+                        mp9_stomachshots = mp9_stomachshots + @mp9Stomachshots,
+                        mp7_stomachshots = mp7_stomachshots + @mp7Stomachshots,
+                        ump45_stomachshots = ump45_stomachshots + @ump45Stomachshots,
+                        p90_stomachshots = p90_stomachshots + @p90Stomachshots,
+                        bizon_stomachshots = bizon_stomachshots + @bizonStomachshots,
+                        negev_stomachshots = negev_stomachshots + @negevStomachshots,
+                        m249_stomachshots = m249_stomachshots + @m249Stomachshots,
+                        ak47_leftlegshots = ak47_leftlegshots + @ak47LeftLegshots,
+                        m4a4_leftlegshots = m4a4_leftlegshots + @m4a4LeftLegshots,
+                        m4a1s_leftlegshots = m4a1s_leftlegshots + @m4a1sLeftLegshots,
+                        aug_leftlegshots = aug_leftlegshots + @augLeftLegshots,
+                        sg553_leftlegshots = sg553_leftlegshots + @sg553LeftLegshots,
+                        galilar_leftlegshots = galilar_leftlegshots + @galilarLeftLegshots,
+                        famas_leftlegshots = famas_leftlegshots + @famasLeftLegshots,
+                        awp_leftlegshots = awp_leftlegshots + @awpLeftLegshots,
+                        scout_leftlegshots = scout_leftlegshots + @scoutLeftLegshots,
+                        scar20_leftlegshots = scar20_leftlegshots + @scar20LeftLegshots,
+                        g3sg1_leftlegshots = g3sg1_leftlegshots + @g3sg1LeftLegshots,
+                        ssg08_leftlegshots = ssg08_leftlegshots + @ssg08LeftLegshots,
+                        deagle_leftlegshots = deagle_leftlegshots + @deagleLeftLegshots,
+                        glock_leftlegshots = glock_leftlegshots + @glockLeftLegshots,
+                        usps_leftlegshots = usps_leftlegshots + @uspsLeftLegshots,
+                        p250_leftlegshots = p250_leftlegshots + @p250LeftLegshots,
+                        p2000_leftlegshots = p2000_leftlegshots + @p2000LeftLegshots,
+                        fiveseven_leftlegshots = fiveseven_leftlegshots + @fivesevenLeftLegshots,
+                        tec9_leftlegshots = tec9_leftlegshots + @tec9LeftLegshots,
+                        cz75_leftlegshots = cz75_leftlegshots + @cz75LeftLegshots,
+                        dualies_leftlegshots = dualies_leftlegshots + @dualiesLeftLegshots,
+                        revolver_leftlegshots = revolver_leftlegshots + @revolverLeftLegshots,
+                        nova_leftlegshots = nova_leftlegshots + @novaLeftLegshots,
+                        xm1014_leftlegshots = xm1014_leftlegshots + @xm1014LeftLegshots,
+                        sawedoff_leftlegshots = sawedoff_leftlegshots + @sawedoffLeftLegshots,
+                        mag7_leftlegshots = mag7_leftlegshots + @mag7LeftLegshots,
+                        mac10_leftlegshots = mac10_leftlegshots + @mac10LeftLegshots,
+                        mp9_leftlegshots = mp9_leftlegshots + @mp9LeftLegshots,
+                        mp7_leftlegshots = mp7_leftlegshots + @mp7LeftLegshots,
+                        ump45_leftlegshots = ump45_leftlegshots + @ump45LeftLegshots,
+                        p90_leftlegshots = p90_leftlegshots + @p90LeftLegshots,
+                        bizon_leftlegshots = bizon_leftlegshots + @bizonLeftLegshots,
+                        negev_leftlegshots = negev_leftlegshots + @negevLeftLegshots,
+                        m249_leftlegshots = m249_leftlegshots + @m249LeftLegshots,
+                        ak47_rightlegshots = ak47_rightlegshots + @ak47RightLegshots,
+                        m4a4_rightlegshots = m4a4_rightlegshots + @m4a4RightLegshots,
+                        m4a1s_rightlegshots = m4a1s_rightlegshots + @m4a1sRightLegshots,
+                        aug_rightlegshots = aug_rightlegshots + @augRightLegshots,
+                        sg553_rightlegshots = sg553_rightlegshots + @sg553RightLegshots,
+                        galilar_rightlegshots = galilar_rightlegshots + @galilarRightLegshots,
+                        famas_rightlegshots = famas_rightlegshots + @famasRightLegshots,
+                        awp_rightlegshots = awp_rightlegshots + @awpRightLegshots,
+                        scout_rightlegshots = scout_rightlegshots + @scoutRightLegshots,
+                        scar20_rightlegshots = scar20_rightlegshots + @scar20RightLegshots,
+                        g3sg1_rightlegshots = g3sg1_rightlegshots + @g3sg1RightLegshots,
+                        ssg08_rightlegshots = ssg08_rightlegshots + @ssg08RightLegshots,
+                        deagle_rightlegshots = deagle_rightlegshots + @deagleRightLegshots,
+                        glock_rightlegshots = glock_rightlegshots + @glockRightLegshots,
+                        usps_rightlegshots = usps_rightlegshots + @uspsRightLegshots,
+                        p250_rightlegshots = p250_rightlegshots + @p250RightLegshots,
+                        p2000_rightlegshots = p2000_rightlegshots + @p2000RightLegshots,
+                        fiveseven_rightlegshots = fiveseven_rightlegshots + @fivesevenRightLegshots,
+                        tec9_rightlegshots = tec9_rightlegshots + @tec9RightLegshots,
+                        cz75_rightlegshots = cz75_rightlegshots + @cz75RightLegshots,
+                        dualies_rightlegshots = dualies_rightlegshots + @dualiesRightLegshots,
+                        revolver_rightlegshots = revolver_rightlegshots + @revolverRightLegshots,
+                        nova_rightlegshots = nova_rightlegshots + @novaRightLegshots,
+                        xm1014_rightlegshots = xm1014_rightlegshots + @xm1014RightLegshots,
+                        sawedoff_rightlegshots = sawedoff_rightlegshots + @sawedoffRightLegshots,
+                        mag7_rightlegshots = mag7_rightlegshots + @mag7RightLegshots,
+                        mac10_rightlegshots = mac10_rightlegshots + @mac10RightLegshots,
+                        mp9_rightlegshots = mp9_rightlegshots + @mp9RightLegshots,
+                        mp7_rightlegshots = mp7_rightlegshots + @mp7RightLegshots,
+                        ump45_rightlegshots = ump45_rightlegshots + @ump45RightLegshots,
+                        p90_rightlegshots = p90_rightlegshots + @p90RightLegshots,
+                        bizon_rightlegshots = bizon_rightlegshots + @bizonRightLegshots,
+                        negev_rightlegshots = negev_rightlegshots + @negevRightLegshots,
+                        m249_rightlegshots = m249_rightlegshots + @m249RightLegshots,
                         last_updated = CURRENT_TIMESTAMP";
 
                 using var connection = new MySqlConnection(_connectionString);
@@ -1353,11 +1671,12 @@ namespace AdvancedStatistics.Database
                 command.Parameters.AddWithValue("@m249RightLegshots", stats.M249RightLegshots);
                 
                 await command.ExecuteNonQueryAsync();
+                _logger?.LogInformation($"[Advanced Statistics] Updated player stats for {stats.PlayerName} ({stats.SteamId})");
                 return true;
             }
             catch (Exception ex)
             {
-                _logger?.LogError($"Failed to update player stats: {ex.Message}");
+                _logger?.LogError($"[Advanced Statistics] Failed to update player stats: {ex.Message}");
                 return false;
             }
         }

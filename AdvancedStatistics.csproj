@@ -6,6 +6,7 @@
     <Nullable>enable</Nullable>
     <AssemblyName>AdvancedStatistics</AssemblyName>
     <RootNamespace>AdvancedStatistics</RootNamespace>
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)'=='Release'">
@@ -20,7 +21,8 @@
 
   <ItemGroup>
     <PackageReference Include="CounterStrikeSharp.API" />
-    <PackageReference Include="MySql.Data" />
+    <PackageReference Include="MySqlConnector" />
+    <PackageReference Include="System.Security.Permissions" />
   </ItemGroup>
 
 </Project>

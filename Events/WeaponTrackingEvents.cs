@@ -1,6 +1,7 @@
 using CounterStrikeSharp.API.Core;
 using CounterStrikeSharp.API.Modules.Entities;
 using AdvancedStatistics.Services;
+using AdvancedStatistics.Utils;
 using Microsoft.Extensions.Logging;
 
 namespace AdvancedStatistics.Events
@@ -8,16 +9,18 @@ namespace AdvancedStatistics.Events
     public class WeaponTrackingEvents
     {
         private readonly StatsService _statsService;
-        private ILogger? _logger;
+        private readonly Logger _logger;
+        private ILogger? _internalLogger;
 
-        public WeaponTrackingEvents(StatsService statsService)
+        public WeaponTrackingEvents(StatsService statsService, Logger logger)
         {
             _statsService = statsService;
+            _logger = logger;
         }
 
         public void SetLogger(ILogger logger)
         {
-            _logger = logger;
+            _internalLogger = logger;
         }
 
         public HookResult OnPlayerDeath(EventPlayerDeath @event, GameEventInfo info)
@@ -51,12 +54,12 @@ namespace AdvancedStatistics.Events
                 // Si hay un asistente, rastrear la asistencia
                 if (@event.Assister != null && @event.Assister.IsValid && @event.Assister != attacker)
                 {
-                    _statsService.TrackAssist(@event.Assister, weaponName);
+                    _statsService.TrackAssist(@event.Assister, attacker, weaponName);
                 }
             }
             catch (Exception ex)
             {
-                _logger?.LogError($"Error in OnPlayerDeath: {ex.Message}");
+                _internalLogger?.LogError($"Error in OnPlayerDeath: {ex.Message}");
             }
 
             return HookResult.Continue;
@@ -85,10 +88,11 @@ namespace AdvancedStatistics.Events
 
                 // Actualizar estadísticas de daño
                 // Esta funcionalidad se puede implementar en el servicio de estadísticas
+                _logger.LogInfo($"Player {attacker.PlayerName} hurt {victim.PlayerName} with {weaponName} for {damage} damage");
             }
             catch (Exception ex)
             {
-                _logger?.LogError($"Error in OnPlayerHurt: {ex.Message}");
+                _internalLogger?.LogError($"Error in OnPlayerHurt: {ex.Message}");
             }
 
             return HookResult.Continue;
@@ -100,11 +104,14 @@ namespace AdvancedStatistics.Events
             {
                 // Guardar todas las estadísticas al final de la ronda
                 // Esto asegura que los datos se guarden periódicamente
-                var saveTask = _statsService.SaveAllStatsAsync();
+                _statsService.SaveAllStats();
+                
+                // Loggear el evento
+                _logger.LogRoundEnd(@event.Winner);
             }
             catch (Exception ex)
             {
-                _logger?.LogError($"Error in OnRoundEnd: {ex.Message}");
+                _internalLogger?.LogError($"Error in OnRoundEnd: {ex.Message}");
             }
 
             return HookResult.Continue;
@@ -119,12 +126,16 @@ namespace AdvancedStatistics.Events
                 if (player != null && player.IsValid)
                 {
                     // Cargar estadísticas del jugador al conectarse
-                    var loadTask = _statsService.GetOrCreatePlayerStatsAsync(player);
+                    // Esta operación puede permanecer asíncrona ya que no modifica datos críticos
+                    _ = _statsService.GetOrCreatePlayerStatsAsync(player);
+                    
+                    // Loggear el evento
+                    _logger.LogPlayerConnect(player.PlayerName, player.SteamID.ToString());
                 }
             }
             catch (Exception ex)
             {
-                _logger?.LogError($"Error in OnPlayerConnectFull: {ex.Message}");
+                _internalLogger?.LogError($"Error in OnPlayerConnectFull: {ex.Message}");
             }
 
             return HookResult.Continue;
@@ -139,12 +150,15 @@ namespace AdvancedStatistics.Events
                 if (player != null && player.IsValid)
                 {
                     // Guardar estadísticas del jugador al desconectarse
-                    var saveTask = _statsService.SavePlayerStatsAsync(player);
+                    _statsService.SavePlayerStats(player);
+                    
+                    // Loggear el evento
+                    _logger.LogPlayerDisconnect(player.PlayerName, player.SteamID.ToString());
                 }
             }
             catch (Exception ex)
             {
-                _logger?.LogError($"Error in OnPlayerDisconnect: {ex.Message}");
+                _internalLogger?.LogError($"Error in OnPlayerDisconnect: {ex.Message}");
             }
 
             return HookResult.Continue;

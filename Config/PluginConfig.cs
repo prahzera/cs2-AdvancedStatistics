@@ -25,5 +25,26 @@ namespace AdvancedStatistics.Config
 
         [JsonPropertyName("UpdateInterval")]
         public int UpdateInterval { get; set; } = 30;
+
+        [JsonPropertyName("EnableLogging")]
+        public bool EnableLogging { get; set; } = true;
+
+        [JsonPropertyName("LogPlayerKills")]
+        public bool LogPlayerKills { get; set; } = true;
+
+        [JsonPropertyName("LogPlayerDeaths")]
+        public bool LogPlayerDeaths { get; set; } = true;
+
+        [JsonPropertyName("LogPlayerAssists")]
+        public bool LogPlayerAssists { get; set; } = true;
+
+        [JsonPropertyName("LogPlayerConnect")]
+        public bool LogPlayerConnect { get; set; } = true;
+
+        [JsonPropertyName("LogPlayerDisconnect")]
+        public bool LogPlayerDisconnect { get; set; } = true;
+
+        [JsonPropertyName("LogRoundEnd")]
+        public bool LogRoundEnd { get; set; } = true;
     }
 }
